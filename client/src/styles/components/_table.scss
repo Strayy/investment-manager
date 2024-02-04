@@ -1,0 +1,36 @@
+.returns-table {
+    width: 100%;
+    font-family: 'Golos Text', Arial, Helvetica, sans-serif;
+    border-spacing: 0;
+
+    tr {
+        &.headings {
+            background-color: #002945;
+        }
+
+        &:not(.headings) td {
+            border-bottom: 1px solid #002945;
+        }
+
+        &.portfolio {
+            background-color: rgba(0, 41, 69, 0.5);
+            font-weight: 600;
+        }
+    
+        th {
+            font-weight: 300;
+            padding: calc(0.5em - 2px) 0.5em 0.5em 0.5em;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.5em;
+            font-size: 0.9em;
+
+            &:not(:nth-child(1)) {
+                font-weight: 400;
+                font-family: 'Courier New', Courier, monospace;
+            }
+        }
+    }
+}

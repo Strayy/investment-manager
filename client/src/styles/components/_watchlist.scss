@@ -1,0 +1,91 @@
+.watchlist-container {
+    height: 100%;
+    width: 100%;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+
+    > div {
+        border-radius: 0.5em;
+        height: calc(100% - 6px);
+        max-width: calc((100% - 5em - 24px) / 6);
+        min-width: calc((100% - 5em - 24px) / 6);
+        position: relative;
+    }
+
+    .no-watchlist-item {
+        color: red;
+        border: 3px solid #002945;
+    }
+
+    .watchlist-item {
+        > i {
+            position: absolute;
+            right: 1em;
+            top: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                opacity: 0.5;
+            }
+        }
+
+        .watchlist-item-inner {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: start;
+            height: calc(100% - 2em);
+            width: calc(100% - 2em);
+            padding: 1em;
+
+            span {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25em;
+
+                .ticker {
+                    font-size: 0.8em;
+                    font-weight: 600;
+                }
+
+                .name {
+                    font-size: 1.2em;
+                }
+
+                .current-price {
+                    font-weight: 400;
+                    font-size: 1.5em;
+                    font-family: 'Courier New', Courier, monospace;
+                }
+    
+                .change {
+                    display: flex;
+                    align-items: row;
+                    gap: 0.5em;
+                    font-family: 'Courier New', Courier, monospace;
+    
+                    i {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            }
+        }
+
+        .company-logo {
+            position: absolute;
+            right: 1em;
+            bottom: 1em;
+            cursor: pointer;
+            
+            img {
+                max-height: 2em;
+                max-width: 6em;
+            }
+        }
+    }
+}

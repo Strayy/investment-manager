@@ -1,15 +1,16 @@
 import Dashboard from "./components/Dashboard";
 import Header from "./components/Header";
+import NavBar from "./components/Navbar";
 import "./styles/styles.scss";
 
 function App() {
     return (
         <div className="app">
-            <div className="header-container">
-                <Header />
+            <div className="navbar">
+                <NavBar />
             </div>
-            <hr />
-            <div className="dashboard-container">
+            <div className="content">
+                <Header />
                 <Dashboard />
             </div>
         </div>

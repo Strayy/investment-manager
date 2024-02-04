@@ -10,11 +10,11 @@
     }
 
     .upper-dashboard-container {
-        height: calc((100% - 1em) / 3);
+        height: calc((100% - 1em) / 100 * 25);
     }
 
     .lower-dashboard-container {
-        height: calc((100% - 1em) / 3 * 2);
+        height: calc((100% - 1em) / 100 * 75);
         display: flex;
         flex-direction: row;
         justify-content: space-between;    

@@ -56,18 +56,20 @@ function Table() {
 
     return (
         <table className="returns-table">
-            <tr className="headings">
-                {/* <td></td> */}
-                <th>Item</th>
-                <th>Value</th>
-                <th>Daily Change</th>
-                <th>YTD</th>
-                {/* <th>All-Time</th> */}
-                <th>Portfolio</th>
-            </tr>
+            <tbody>
+                <tr className="headings">
+                    {/* <td></td> */}
+                    <th>Item</th>
+                    <th>Value</th>
+                    <th>Daily Change</th>
+                    <th>YTD</th>
+                    {/* <th>All-Time</th> */}
+                    <th>Portfolio</th>
+                </tr>
 
-            {returnPortfolio()}
-            {returnFavourites()}
+                {returnPortfolio()}
+                {returnFavourites()}
+            </tbody>
         </table>
     );
 }

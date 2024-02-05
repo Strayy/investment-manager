@@ -35,13 +35,17 @@ function Graph() {
 
     useEffect(() => {
         async function fetchStockData() {
-            const responses = await Promise.all(tickers.map(ticker => fetch(`http://localhost:5000/getData/${ticker}`)));
+            const responses = await Promise.all(
+                tickers.map((ticker) =>
+                    fetch(`http://localhost:5000/api/getData/${ticker}`)
+                )
+            );
 
             responses.map(async (response) => {
                 const singleTickerData = await response.json();
-                const ticker = response.url.split('/').slice(-1);
+                const ticker = response.url.split("/").slice(-1);
 
-                setStockPriceData(stockPriceData => {
+                setStockPriceData((stockPriceData) => {
                     const newDataWithKey = { [ticker[0]]: singleTickerData };
                     return { ...stockPriceData, ...newDataWithKey };
                 });
@@ -49,42 +53,41 @@ function Graph() {
         }
 
         async function fetchCompanyData() {
-            const companyData = await fetch('http://localhost:5000/getCompanyData/')
-                .then(res => res.json())
-                .then(data => {
-                    return(data)
-                })
+            const companyData = await fetch(
+                "http://localhost:5000/api/getCompanyData/"
+            )
+                .then((res) => res.json())
+                .then((data) => {
+                    return data;
+                });
 
             setCompanyData(companyData);
         }
 
-        fetch('http://localhost:5000/getCompanyData/')
-            .then(res => res.json())
-            .then(data => console.log(data))
-
         fetchCompanyData();
         fetchStockData();
-    }, [])
+    }, []);
 
     useEffect(() => {
-        console.log(stockPriceData);
-
         let dateList: string[] = [];
         let datasetsList: {}[] = [];
 
         Promise.all(
             tickers.map(async (ticker) => {
-                if (Object.keys(stockPriceData).length !== 0 && Object.keys(companyData).length !== 0) {
+                if (
+                    Object.keys(stockPriceData).length !== 0 &&
+                    Object.keys(companyData).length !== 0
+                ) {
                     const data = stockPriceData[ticker];
 
-                    const dateEntries = await data.map(entry => {
+                    const dateEntries = await data.map((entry) => {
                         return entry.Date;
                     });
                     dateList.push(...dateEntries);
 
-                    const datasetEntries = await data.map(entry => {
+                    const datasetEntries = await data.map((entry) => {
                         return entry.Close;
-                    })
+                    });
 
                     const stockColor = hexRgb(companyData[ticker].color);
 
@@ -93,7 +96,7 @@ function Graph() {
                         data: datasetEntries,
                         borderColor: `rgb(${stockColor.red}, ${stockColor.green}, ${stockColor.blue})`,
                         backgroundColor: `rgba(${stockColor.red}, ${stockColor.green}, ${stockColor.blue}, 0.5)`,
-                        tension: 0.25
+                        tension: 0.25,
                     });
                 }
             })

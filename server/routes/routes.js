@@ -3,24 +3,9 @@ const router = express.Router();
 router.use(express.json());
 const csvToJson = require("csvtojson");
 
-// TODO - Create endpoint for seeding db with all test information
-// SEED DATABASE WITH ALL INFO
-router.get("/seedDB/all", async (req, res) => {
-    try {
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// TODO - Create endpoint for seeding db with pricing information
-// SEED DATABASE WITH PRICING INFORMATION
-// const pricingRouter = require("./seed/stocks");
-// router.get("/seed/pricing", pricingRouter);
-
-// TODO - Create endpoint for seeding db with stocks information
-// SEED DATABASE WITH STOCKS INFORMATION
-// const stocksRouter = require("./seed/stocks");
-// router.get("/seed/stocks/", stocksRouter);
+// SEED DATABASE ENDPOINTS
+const seedRouter = require("./seed");
+router.use("/seed", seedRouter);
 
 //TODO - Update stock price data endpoint to return from db
 // RETURN STOCK PRICE DATA

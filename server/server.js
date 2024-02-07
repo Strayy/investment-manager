@@ -4,8 +4,11 @@ const cors = require("cors");
 require("dotenv").config();
 const csvToJson = require("csvtojson");
 
-const mongoConnectionString = process.env.MONGO_URI;
-mongoose.connect(mongoConnectionString);
+const mongoConnectionString = `${process.env.MONGO_URI}investment-manager`;
+mongoose.connect(mongoConnectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 const database = mongoose.connection;
 
 database.on("error", (error) => {

@@ -1,4 +1,1 @@
-- Create endpoints to seed database with stock/company information
-- Download CSV files of 10 different companies performance
-- Create endpoints to seed database with CSV files using current timestamp as title
 - Unit test seed endpoints

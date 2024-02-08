@@ -6,6 +6,10 @@
     max-width: 3em;
     height: calc(100% - 2em);
 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
     .logo {
         padding: 0;
         height: 3em;
@@ -13,7 +17,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding-bottoM: 1em;
+        padding-bottom: 1em;
         border-bottom: 2px solid #002945;
 
         img {
@@ -22,6 +26,50 @@
             width: auto;
             height: auto;
             cursor: pointer;
+        }
+    }
+
+    .tabs {
+        margin-top: 1em;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        span {
+            padding: 0.5em;
+            cursor: pointer;
+            border-radius: 5px;
+            animation: all 0.3s ease;
+
+            &:hover {
+                background-color: #002945;
+            }
+
+            i {
+                font-size: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+
+    .tabEnd div {
+        padding: 0.5em;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #002945;
+        }
+
+        i {
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     }
 }

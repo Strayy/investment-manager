@@ -8,9 +8,15 @@ function NavBar() {
                 <img src={applicationLogoPath} alt="logo" />
             </div>
             <div className="tabs">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span>
+                    <i className="fi fi-rr-rectangle-list"></i>
+                </span>
+            </div>
+
+            <div className="tabEnd">
+                <div>
+                    <i className="fi fi-rr-plus-hexagon"></i>
+                </div>
             </div>
         </div>
     );

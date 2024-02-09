@@ -40,7 +40,7 @@
             padding: 0.5em;
             cursor: pointer;
             border-radius: 5px;
-            animation: all 0.3s ease;
+            transition: all 0.3s ease;
 
             &:hover {
                 background-color: #002945;

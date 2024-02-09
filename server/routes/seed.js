@@ -40,10 +40,62 @@ function validateFiles(prefix, fileType, fileList) {
     throw new Error("No seed files found in /seed_data/.");
 }
 
-// TODO - Create endpoint for deleting old seed collections
-router.delete("/seed/deleteOld", async (req, res) => {
+// DELETE OLD SEED COLLECTIONS FROM MONGODB DATABASE
+router.delete("/deleteOld", async (req, res) => {
     try {
-        console.log("DELETING");
+        const collections = await mongoose.connection.db
+            .listCollections()
+            .toArray();
+
+        const deletedCollections = [];
+
+        const mostRecentCollections = collections.reduce(
+            (currentStore, collection) => {
+                const collectionCreationTime = parseInt(
+                    collection.name.slice(-13)
+                );
+                const collectionType = collection.name.substring(
+                    0,
+                    collection.name.length - 14
+                );
+
+                if (
+                    !currentStore[collectionType] ||
+                    collectionCreationTime >
+                        parseInt(currentStore[collectionType].slice(-13))
+                ) {
+                    currentStore[collectionType] = collection.name;
+                }
+
+                return currentStore;
+            },
+            {}
+        );
+
+        await Promise.all(
+            collections.map(async (collection) => {
+                if (
+                    collection.name !=
+                    mostRecentCollections[
+                        collection.name.substring(
+                            0,
+                            collection.name.length - 14
+                        )
+                    ]
+                ) {
+                    await mongoose.connection.db.dropCollection(
+                        collection.name
+                    );
+                    deletedCollections.push(collection.name);
+                }
+            })
+        );
+
+        res.status(200).json({
+            message: "Successfully deleted old seed files from DB",
+            recentCollections: Object.values(mostRecentCollections),
+            delectedCollections: deletedCollections,
+        });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
@@ -51,7 +103,7 @@ router.delete("/seed/deleteOld", async (req, res) => {
 
 // TODO - Create endpoint for seeding db with all test information
 // SEED DATABASE WITH ALL INFO
-router.post("/seed/all", async (req, res) => {
+router.post("/all", async (req, res) => {
     try {
         res.send(true);
     } catch (err) {
@@ -113,7 +165,7 @@ router.post("/stocks", async (req, res) => {
 // SEED DATABASE WITH PRICING INFORMATION. DATA SEPARATED INTO COLLECTIONS BY EXCHANGE
 router.post("/pricing", async (req, res) => {
     const pricingSchema = require("../models/pricingSchema");
-    const epochTime = Date.now();
+    const timeNow = Date.now();
 
     try {
         const files = await getSeedFiles();
@@ -131,7 +183,7 @@ router.post("/pricing", async (req, res) => {
                 file.match(/performance_(\w+)_(\w+(-\w+)?)\.csv/) || [];
 
             const pricingModel = mongoose.model(
-                `performance-${market}-${epochTime}`,
+                `performance-${market}-${timeNow}`,
                 pricingSchema
             );
 
@@ -140,8 +192,6 @@ router.post("/pricing", async (req, res) => {
             const jsonArray = await csvtojson().fromFile(
                 path.join(__dirname, "../seed_data/", file)
             );
-
-            console.log(file);
 
             const documents = jsonArray.map((stockPerformance) => {
                 if (

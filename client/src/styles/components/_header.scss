@@ -13,6 +13,10 @@
         flex-direction: row;
         gap: 0.5em;
 
+        a {
+            text-decoration: none;
+        }
+
         input, select {
             padding: 1em;
             border-radius: 0.5em;

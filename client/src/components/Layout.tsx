@@ -1,21 +1,20 @@
-import Dashboard from "../components/Dashboard";
+import { Outlet } from "react-router-dom";
+
 import Header from "../components/Header";
 import NavBar from "../components/Navbar";
 
-import "../styles/home.scss";
-
-function Home() {
+function Layout() {
     return (
-        <div className="home">
+        <div className="layout">
             <div className="navbar">
                 <NavBar />
             </div>
             <div className="content">
                 <Header />
-                <Dashboard />
+                <Outlet />
             </div>
         </div>
     );
 }
 
-export default Home;
+export default Layout;

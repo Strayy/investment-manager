@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const path = require("path");
 const csvtojson = require("csvtojson");
@@ -106,6 +107,57 @@ router.delete("/deleteOld", async (req, res) => {
 router.post("/all", async (req, res) => {
     try {
         res.send(true);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// SEED DATABASE WITH TEST USER
+router.post("/testUser", async (req, res) => {
+    const userModel = require("../models/userModel");
+
+    try {
+        const files = await getSeedFiles();
+
+        let [acceptedFiles, rejectedFiles] = validateFiles(
+            "profile_",
+            ".json",
+            files
+        );
+        let failedImport = [];
+
+        await Promise.all(
+            acceptedFiles.map(async (file) => {
+                const fileContents = await fs.readFile(
+                    `${__dirname}/../seed_data/${file}`,
+                    "utf8"
+                );
+                const jsonArray = JSON.parse(fileContents);
+
+                if (
+                    jsonArray["firstName"] &&
+                    jsonArray["lastName"] &&
+                    jsonArray["email"] &&
+                    jsonArray["password"]
+                ) {
+                    await userModel.create({
+                        id: uuidv4(),
+                        ...jsonArray,
+                    });
+                } else {
+                    failedImport.push({
+                        data: jsonArray,
+                        message: "check data input",
+                    });
+                }
+            })
+        );
+
+        res.status(200).json({
+            message: "Seed DB with user information successful.",
+            addedFiles: acceptedFiles,
+            failedImports: [rejectedFiles, failedImport],
+        });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

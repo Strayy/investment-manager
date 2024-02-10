@@ -1,0 +1,61 @@
+.portfolio {
+    .portfolio-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1em;
+        
+        > div {
+            display: flex;
+
+            div {
+                border-radius: 5px;
+                padding: 0.25em 2em;
+                transition: all 0.3s ease;
+                cursor: pointer;
+
+                &:nth-child(1) {
+                    border: 2px solid #002945;
+                    border-right-width: 1px;
+                    border-radius: 5px 0 0 5px;
+
+                    &:hover {
+                        border-color: #38a700;
+                        background-color: rgba(56, 167, 0, 0.5);
+                    }
+                }
+
+                &:nth-child(2) {
+                    border: 2px solid #002945;
+                    border-left-width: 1px;
+                    border-radius: 0 5px 5px 0;
+
+                    &:hover {
+                        border-color: #ef3e36;
+                        background-color: rgba(239, 62, 54, 0.5);
+                    }
+                }
+            }
+        }
+    }
+
+    .portfolio-elements {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        // background-color: green;
+        height: 100%;
+
+        .table {
+            // background-color: red;
+            flex-grow: 1;
+        }
+
+        .graph {
+            // background-color: orange;
+            flex-grow: 2;
+            margin-bottom: 1em;
+        }
+    }
+}

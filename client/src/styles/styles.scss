@@ -1,8 +1,10 @@
 @import "components/header";
-@import "components/dashboard";
 @import "components/watchlist";
 @import "components/table";
 @import "components/navbar";
+
+@import "pages/dashboard";
+@import "pages/portfolio";
 
 // Import Google Fonts
 @import url("https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800;900&display=swap");

@@ -1,6 +1,6 @@
-import Graph from "./Graph";
-import Table from "./Table";
-import Watchlist from "./Watchlist";
+import Graph from "../components/Graph";
+import Table from "../components/Table";
+import Watchlist from "../components/Watchlist";
 
 function Dashboard() {
     return (

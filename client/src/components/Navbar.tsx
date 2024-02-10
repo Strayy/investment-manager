@@ -11,16 +11,19 @@ function NavBar() {
                     <img src={applicationLogoPath} alt="logo" />
                 </div>
             </Link>
+
             <div className="tabs">
-                <span>
+                <Link to="/portfolio">
                     <i className="fi fi-rr-rectangle-list"></i>
-                </span>
+                </Link>
             </div>
 
             <div className="tab-end">
-                <div>
-                    <i className="fi fi-rr-plus-hexagon"></i>
-                </div>
+                <Link to="/portfolio">
+                    <div>
+                        <i className="fi fi-rr-plus-hexagon"></i>
+                    </div>
+                </Link>
             </div>
         </div>
     );

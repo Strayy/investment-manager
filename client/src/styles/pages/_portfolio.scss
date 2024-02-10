@@ -1,4 +1,6 @@
 .portfolio {
+    flex-grow: 1;
+
     .portfolio-title {
         display: flex;
         flex-direction: row;
@@ -43,8 +45,8 @@
     .portfolio-elements {
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         gap: 1em;
-        // background-color: green;
         height: 100%;
 
         .table {
@@ -53,9 +55,12 @@
         }
 
         .graph {
-            // background-color: orange;
-            flex-grow: 2;
+            height: 50%;
             margin-bottom: 1em;
+
+            canvas {
+                margin-bottom: 2em;
+            }
         }
     }
 }

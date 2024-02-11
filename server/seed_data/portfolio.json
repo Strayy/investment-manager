@@ -1,0 +1,25 @@
+{
+    "test@test.com": {
+        "NASDAQ_TSLA": [
+            {
+                "action": "BUY",
+                "date": "2023-12-07",
+                "price": 242.639999,
+                "amount": 10
+            },
+            {
+                "action": "SELL",
+                "date": "2024-01-05",
+                "price": 237.490005,
+                "amount": 7
+            },
+            {
+                "action": "BUY",
+                "date": "2024-02-11",
+                "price": 193.57,
+                "amount": 5
+            },
+            { "action": "SELL" }
+        ]
+    }
+}

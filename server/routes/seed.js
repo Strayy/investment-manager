@@ -8,6 +8,7 @@ const csvtojson = require("csvtojson");
 const fs = require("fs").promises;
 const seedFolder = "./seed_data";
 
+// Function to return all seed files found in the /seed_data/ directory
 async function getSeedFiles() {
     try {
         const files = await fs.readdir(seedFolder);
@@ -39,6 +40,20 @@ function validateFiles(prefix, fileType, fileList) {
         return [acceptedFiles, rejectedFiles];
     }
     throw new Error("No seed files found in /seed_data/.");
+}
+
+// Function to convert keys of an object to lowercase for storage in database
+function convertKeysToLowercase(obj) {
+    const convertedObject = {};
+
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const lowercaseKey = key.toLowerCase();
+            convertedObject[lowercaseKey] = obj[key];
+        }
+    }
+
+    return convertedObject;
 }
 
 // DELETE OLD SEED COLLECTIONS FROM MONGODB DATABASE
@@ -163,6 +178,72 @@ router.post("/testUser", async (req, res) => {
     }
 });
 
+//FIXME - This whole route can probably be tidied up
+// SEED DATABASE WITH PORTFOLIO HISTORY INFORMATION
+router.post("/portfolio", async (req, res) => {
+    const portfolioModel = require("../models/portfolioModel");
+    const userModel = require("../models/userModel");
+
+    try {
+        const files = await getSeedFiles();
+        let [acceptedFiles] = validateFiles("portfolio", ".json", files);
+        let failedImport = [];
+
+        await Promise.all(
+            acceptedFiles.map(async (file) => {
+                const fileContents = await fs.readFile(
+                    `${__dirname}/../seed_data/${file}`,
+                    "utf8"
+                );
+                const jsonArray = JSON.parse(fileContents);
+
+                await Promise.all(
+                    Object.keys(jsonArray).map(async (userEmail) => {
+                        const userProfile = await userModel.findOne({
+                            email: userEmail,
+                        });
+
+                        Object.keys(jsonArray[userEmail]).map(async (stock) => {
+                            jsonArray[userEmail][stock].map(
+                                async (transaction) => {
+                                    if (
+                                        transaction["action"] &&
+                                        transaction["date"] &&
+                                        transaction["price"] &&
+                                        transaction["amount"]
+                                    ) {
+                                        await portfolioModel.create({
+                                            userId: userProfile.id,
+                                            stockId: stock,
+                                            action: transaction["action"],
+                                            date: new Date(transaction["date"]),
+                                            price: transaction["price"],
+                                            amount: transaction["amount"],
+                                        });
+                                    } else {
+                                        failedImport.push({
+                                            data: transaction,
+                                            message: "check data input",
+                                        });
+                                    }
+                                }
+                            );
+                        });
+                    })
+                );
+            })
+        );
+
+        res.status(200).json({
+            message: "Seed DB with portfolio information successful.",
+            addedFiles: acceptedFiles,
+            failedImports: failedImport,
+        });
+    } catch (err) {
+        res.status(200).json({ message: err.message });
+    }
+});
+
 // SEED DATABASE WITH STOCKS INFORMATION
 router.post("/stocks", async (req, res) => {
     const stocksModel = require("../models/stocksModel");
@@ -186,9 +267,7 @@ router.post("/stocks", async (req, res) => {
                     if (stock["Exchange"] && stock["Ticker"] && stock["Name"]) {
                         return {
                             id: `${stock["Exchange"]}_${stock["Ticker"]}`,
-                            ticker: stock["Ticker"],
-                            name: stock["Name"],
-                            exchange: stock["Exchange"],
+                            ...convertKeysToLowercase(stock),
                         };
                     } else {
                         failedImport.push({
@@ -255,6 +334,7 @@ router.post("/pricing", async (req, res) => {
                     stockPerformance["Adj Close"] !== "null" &&
                     stockPerformance["Volume"] !== "null"
                 ) {
+                    //FIXME - Use spread operator below
                     return {
                         stock: ticker,
                         date: new Date(stockPerformance["Date"]),

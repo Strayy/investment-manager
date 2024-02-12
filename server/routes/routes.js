@@ -7,6 +7,10 @@ const csvToJson = require("csvtojson");
 const seedRouter = require("./seed");
 router.use("/seed", seedRouter);
 
+// PORTFOLIO ENDPOINTS
+const portfolioRouter = require("./portfolio");
+router.use("/portfolio", portfolioRouter);
+
 //TODO - Update stock price data endpoint to return from db
 // RETURN STOCK PRICE DATA
 router.get("/getData/:ticker", async (req, res) => {
@@ -20,6 +24,7 @@ router.get("/getData/:ticker", async (req, res) => {
     }
 });
 
+// TODO - Integrate into database/seed files until branding API is connected
 // RETURN COMPANY INFORMATION
 router.get("/getCompanyData/", async (req, res) => {
     res.send(

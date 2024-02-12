@@ -168,7 +168,7 @@ router.post("/testUser", async (req, res) => {
                     jsonArray["password"]
                 ) {
                     await userModel.create({
-                        id: uuidv4(),
+                        id: "TEST-USER-ID",
                         ...jsonArray,
                     });
                 } else {

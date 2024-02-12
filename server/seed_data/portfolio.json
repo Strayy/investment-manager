@@ -18,8 +18,21 @@
                 "date": "2024-02-11",
                 "price": 193.57,
                 "amount": 5
+            }
+        ],
+        "ASX_CAR": [
+            {
+                "action": "BUY",
+                "date": "2023-09-12",
+                "price": 29.9,
+                "amount": 10
             },
-            { "action": "SELL" }
+            {
+                "action": "BUY",
+                "date": "2024-02-12",
+                "price": 34.03,
+                "amount": 10
+            }
         ]
     }
 }

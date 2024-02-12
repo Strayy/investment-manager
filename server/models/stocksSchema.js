@@ -31,4 +31,4 @@ const stocksSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model(`stocks-data-${Date.now()}`, stocksSchema);
+module.exports = stocksSchema;

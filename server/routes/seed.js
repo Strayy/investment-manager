@@ -62,10 +62,19 @@ router.delete("/deleteOld", async (req, res) => {
         const collections = await mongoose.connection.db
             .listCollections()
             .toArray();
+        let deletedCollections = [];
+        let datedCollections = [];
+        let nonDatedCollections = [];
 
-        const deletedCollections = [];
+        collections.forEach((collection) => {
+            if (/\d$/.test(collection.name)) {
+                datedCollections.push(collection);
+            } else {
+                nonDatedCollections.push(collection.name);
+            }
+        });
 
-        const mostRecentCollections = collections.reduce(
+        const mostRecentCollections = datedCollections.reduce(
             (currentStore, collection) => {
                 const collectionCreationTime = parseInt(
                     collection.name.slice(-13)
@@ -89,7 +98,7 @@ router.delete("/deleteOld", async (req, res) => {
         );
 
         await Promise.all(
-            collections.map(async (collection) => {
+            datedCollections.map(async (collection) => {
                 if (
                     collection.name !=
                     mostRecentCollections[
@@ -109,7 +118,10 @@ router.delete("/deleteOld", async (req, res) => {
 
         res.status(200).json({
             message: "Successfully deleted old seed files from DB",
-            recentCollections: Object.values(mostRecentCollections),
+            recentCollections: [
+                ...Object.values(mostRecentCollections),
+                ...nonDatedCollections,
+            ],
             delectedCollections: deletedCollections,
         });
     } catch (err) {
@@ -246,7 +258,11 @@ router.post("/portfolio", async (req, res) => {
 
 // SEED DATABASE WITH STOCKS INFORMATION
 router.post("/stocks", async (req, res) => {
-    const stocksModel = require("../models/stocksModel");
+    const stocksSchema = require("../models/stocksSchema");
+    const stocksModel = mongoose.model(
+        `stocks-data-${Date.now()}`,
+        stocksSchema
+    );
 
     try {
         const files = await getSeedFiles();

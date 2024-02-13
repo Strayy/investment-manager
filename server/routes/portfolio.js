@@ -9,7 +9,7 @@ const portfolioModel = require("../models/portfolioModel");
 // RETURN LIST OF TRADES
 router.get("/getTrades", async (req, res) => {
     try {
-        const data = await portfolioModel.find({ userId: req.body["userId"] });
+        const data = await portfolioModel.find({ userId: req.query.userId });
 
         res.status(200).json(data);
     } catch (err) {
@@ -17,6 +17,7 @@ router.get("/getTrades", async (req, res) => {
     }
 });
 
+// TODO - Add endpoint for adding transaction/trade
 // ADD TRADE TO TRANSACTIONS
 router.post("/addTrade", async (req, res) => {
     try {
@@ -31,7 +32,9 @@ router.post("/addTrade", async (req, res) => {
 // GET CURRENT HOLDINGS
 router.get("/getHoldings", async (req, res) => {
     try {
-        const distinctValues = await portfolioModel.distinct("stockId");
+        const distinctValues = await portfolioModel.distinct("stockId", {
+            userId: req.query.userId,
+        });
         let holdings = {};
 
         await Promise.all(
@@ -41,7 +44,7 @@ router.get("/getHoldings", async (req, res) => {
                 let amount = 0;
 
                 const singleStockData = await portfolioModel.find({
-                    userId: req.body["userId"],
+                    userId: req.query.userId,
                     stockId: stock,
                 });
 

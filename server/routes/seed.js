@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
+const axios = require("axios");
 
 const path = require("path");
 const csvtojson = require("csvtojson");
 const fs = require("fs").promises;
 const seedFolder = "./seed_data";
+
+require("dotenv").config();
+const localPort = process.env.PORT;
 
 // Function to return all seed files found in the /seed_data/ directory
 async function getSeedFiles() {
@@ -129,11 +133,49 @@ router.delete("/deleteOld", async (req, res) => {
     }
 });
 
-// TODO - Create endpoint for seeding db with all test information
 // SEED DATABASE WITH ALL INFO
 router.post("/all", async (req, res) => {
     try {
-        res.send(true);
+        const seedEndpoints = {
+            seedStocks: {
+                endpoint: "/seed/stocks",
+                method: axios.post,
+            },
+            seedPerformance: {
+                endpoint: "/seed/pricing",
+                method: axios.post,
+            },
+            seedTestUser: {
+                endpoint: "/seed/testUser",
+                method: axios.post,
+            },
+            seedTestUserPortfolio: {
+                endpoint: "/seed/portfolio",
+                method: axios.post,
+            },
+            deleteOld: {
+                endpoint: "/seed/deleteOld",
+                method: axios.delete,
+            },
+        };
+
+        const responses = {};
+
+        for (const [endpointKey, { endpoint, method }] of Object.entries(
+            seedEndpoints
+        )) {
+            try {
+                const response = await method(
+                    `http://localhost:${localPort}/api${endpoint}`
+                );
+                responses[endpointKey] = response.data;
+                console.log(response.data);
+            } catch (error) {
+                responses[endpointKey] = { error: error.message };
+            }
+        }
+
+        res.status(200).json(responses);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

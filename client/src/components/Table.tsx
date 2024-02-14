@@ -17,8 +17,6 @@ function Table(data: any) {
 
         if (data.data.sections) {
             Object.entries(data.data.sections).forEach((section: any) => {
-                console.log(section);
-
                 const sectionElement: JSX.Element[][] = [];
 
                 sectionElement.push([
@@ -39,9 +37,24 @@ function Table(data: any) {
                 section[1].data.forEach((sectionData: (string | number)[]) => {
                     const sectionRow: JSX.Element[] = [];
 
-                    sectionData.forEach((sectionDataItem: string | number) => {
-                        sectionRow.push(<td>{sectionDataItem}</td>);
-                    });
+                    sectionData.forEach(
+                        (sectionDataItem: string | number, index: number) => {
+                            sectionRow.push(
+                                <td
+                                    className={
+                                        data.data.settings.boldDataColumns &&
+                                        data.data.settings.boldDataColumns.includes(
+                                            index
+                                        )
+                                            ? "bold-data"
+                                            : ""
+                                    }
+                                >
+                                    {sectionDataItem}
+                                </td>
+                            );
+                        }
+                    );
 
                     sectionElement.push([<tr>{sectionRow}</tr>]);
                 });

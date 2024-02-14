@@ -30,6 +30,10 @@
             &:not(:nth-child(1)) {
                 font-weight: 400;
             }
+
+            &.bold-data {
+                font-weight: 600;
+            }
         }
     }
 }

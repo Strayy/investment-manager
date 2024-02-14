@@ -65,7 +65,7 @@ function Portfolio() {
                 lockSectionHeadingOnScroll: false,
                 sortBySection: false,
                 filterBySection: false,
-                boldDataColumns: [1],
+                boldDataColumns: [0],
             },
         });
     }, [portfolioData]);

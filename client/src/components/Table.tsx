@@ -1,76 +1,71 @@
-function Table() {
-    function returnPortfolio() {
-        return (
-            <tr className="portfolio">
-                <td>Portfolio</td>
-                <td>$2,478.76</td>
-                <td>$69.65 (2.81%)</td>
-                <td>$1,076.67 (43.44%)</td>
-                {/* <td>$500</td> */}
-                <td>-</td>
-            </tr>
-        );
+// TODO Fix TS imports to use ITableData/create new ISectionData interface
+import ITableData from "../types/tableData";
+
+function Table(data: any) {
+    function returnHeadings() {
+        let thElements: JSX.Element[] = [];
+
+        data.data.headings.forEach((heading: string) => {
+            thElements.push(<th>{heading}</th>);
+        });
+
+        return thElements;
     }
 
-    function returnFavourites() {
-        return (
-            <>
-                <tr>
-                    {/* <td className="trend-change">
-                        <i className="fi fi-br-arrow-trend-up"></i>
-                    </td> */}
-                    <td>TSLA</td>
-                    <td>$185.90</td>
-                    <td>$5.36 (2.97%)</td>
-                    <td>$77.80 (71.97%)</td>
-                    {/* <td>Lorem.</td> */}
-                    <td>38.5%</td>
-                </tr>
+    function returnSections() {
+        let sections: JSX.Element[][][] = [];
 
-                <tr>
-                    {/* <td className="trend-change">
-                        <i className="fi fi-br-arrow-trend-up"></i>
-                    </td> */}
-                    <td>MSFT</td>
-                    <td>$289.84</td>
-                    <td>$6.35 (2.24%)</td>
-                    <td>$50.26 (20.98%)</td>
-                    {/* <td>Lorem.</td> */}
-                    <td>36.7%</td>
-                </tr>
+        if (data.data.sections) {
+            Object.entries(data.data.sections).forEach((section: any) => {
+                console.log(section);
 
-                <tr>
-                    {/* <td className="trend-change">
-                        <i className="fi fi-br-arrow-trend-up"></i>
-                    </td> */}
-                    <td>AAPL</td>
-                    <td>$165.56</td>
-                    <td>$5.46 (3.41%)</td>
-                    <td>$40.49 (32.37%)</td>
-                    {/* <td>Lorem.</td> */}
-                    <td>24.8%</td>
-                </tr>
-            </>
-        );
+                const sectionElement: JSX.Element[][] = [];
+
+                sectionElement.push([
+                    <tr
+                        className={
+                            section[1].importance &&
+                            `importance-${section[1].importance}`
+                        }
+                    >
+                        {section[1].heading && (
+                            <td colSpan={section[1].data[0].length}>
+                                {section[1].heading}
+                            </td>
+                        )}
+                    </tr>,
+                ]);
+
+                section[1].data.forEach((sectionData: (string | number)[]) => {
+                    const sectionRow: JSX.Element[] = [];
+
+                    sectionData.forEach((sectionDataItem: string | number) => {
+                        sectionRow.push(<td>{sectionDataItem}</td>);
+                    });
+
+                    sectionElement.push([<tr>{sectionRow}</tr>]);
+                });
+
+                sections.push(sectionElement);
+            });
+
+            return sections;
+        }
     }
 
     return (
-        <table className="returns-table">
-            <tbody>
-                <tr className="headings">
-                    {/* <td></td> */}
-                    <th>Item</th>
-                    <th>Value</th>
-                    <th>Daily Change</th>
-                    <th>YTD</th>
-                    {/* <th>All-Time</th> */}
-                    <th>Portfolio</th>
-                </tr>
-
-                {returnPortfolio()}
-                {returnFavourites()}
-            </tbody>
-        </table>
+        <div className="table">
+            <table className="returns-table">
+                <tbody>
+                    {data.data !== null && (
+                        <>
+                            <tr className="headings">{returnHeadings()}</tr>
+                            {returnSections()}
+                        </>
+                    )}
+                </tbody>
+            </table>
+        </div>
     );
 }
 

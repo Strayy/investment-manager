@@ -60,79 +60,6 @@ function convertKeysToLowercase(obj) {
     return convertedObject;
 }
 
-// DELETE OLD SEED COLLECTIONS FROM MONGODB DATABASE
-router.delete("/deleteOld", async (req, res) => {
-    try {
-        const collections = await mongoose.connection.db
-            .listCollections()
-            .toArray();
-        let deletedCollections = [];
-        let datedCollections = [];
-        let nonDatedCollections = [];
-
-        collections.forEach((collection) => {
-            if (/\d$/.test(collection.name)) {
-                datedCollections.push(collection);
-            } else {
-                nonDatedCollections.push(collection.name);
-            }
-        });
-
-        const mostRecentCollections = datedCollections.reduce(
-            (currentStore, collection) => {
-                const collectionCreationTime = parseInt(
-                    collection.name.slice(-13)
-                );
-                const collectionType = collection.name.substring(
-                    0,
-                    collection.name.length - 14
-                );
-
-                if (
-                    !currentStore[collectionType] ||
-                    collectionCreationTime >
-                        parseInt(currentStore[collectionType].slice(-13))
-                ) {
-                    currentStore[collectionType] = collection.name;
-                }
-
-                return currentStore;
-            },
-            {}
-        );
-
-        await Promise.all(
-            datedCollections.map(async (collection) => {
-                if (
-                    collection.name !=
-                    mostRecentCollections[
-                        collection.name.substring(
-                            0,
-                            collection.name.length - 14
-                        )
-                    ]
-                ) {
-                    await mongoose.connection.db.dropCollection(
-                        collection.name
-                    );
-                    deletedCollections.push(collection.name);
-                }
-            })
-        );
-
-        res.status(200).json({
-            message: "Successfully deleted old seed files from DB",
-            recentCollections: [
-                ...Object.values(mostRecentCollections),
-                ...nonDatedCollections,
-            ],
-            delectedCollections: deletedCollections,
-        });
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
 // SEED DATABASE WITH ALL INFO
 router.post("/all", async (req, res) => {
     try {
@@ -152,10 +79,6 @@ router.post("/all", async (req, res) => {
             seedTestUserPortfolio: {
                 endpoint: "/seed/portfolio",
                 method: axios.post,
-            },
-            deleteOld: {
-                endpoint: "/seed/deleteOld",
-                method: axios.delete,
             },
         };
 

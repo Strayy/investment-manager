@@ -31,4 +31,4 @@ const stocksSchema = new mongoose.Schema({
     },
 });
 
-module.exports = stocksSchema;
+module.exports = mongoose.model("stocks-data", stocksSchema);

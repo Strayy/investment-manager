@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+mongoose.pluralize(null);
 const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
 
@@ -92,7 +93,6 @@ router.post("/all", async (req, res) => {
                     `http://localhost:${localPort}/api${endpoint}`
                 );
                 responses[endpointKey] = response.data;
-                console.log(response.data);
             } catch (error) {
                 responses[endpointKey] = { error: error.message };
             }
@@ -149,6 +149,7 @@ router.post("/testUser", async (req, res) => {
             message: "Seed DB with user information successful.",
             addedFiles: acceptedFiles,
             failedImports: [rejectedFiles, failedImport],
+            seed_location: userModel.collection.name,
         });
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -215,6 +216,7 @@ router.post("/portfolio", async (req, res) => {
             message: "Seed DB with portfolio information successful.",
             addedFiles: acceptedFiles,
             failedImports: failedImport,
+            seed_location: portfolioModel.collection.name,
         });
     } catch (err) {
         res.status(200).json({ message: err.message });
@@ -223,11 +225,7 @@ router.post("/portfolio", async (req, res) => {
 
 // SEED DATABASE WITH STOCKS INFORMATION
 router.post("/stocks", async (req, res) => {
-    const stocksSchema = require("../models/stocksSchema");
-    const stocksModel = mongoose.model(
-        `stocks-data-${Date.now()}`,
-        stocksSchema
-    );
+    const stocksModel = require("../models/stocksModel");
 
     try {
         const files = await getSeedFiles();
@@ -277,7 +275,6 @@ router.post("/stocks", async (req, res) => {
 // SEED DATABASE WITH PRICING INFORMATION. DATA SEPARATED INTO COLLECTIONS BY EXCHANGE
 router.post("/pricing", async (req, res) => {
     const pricingSchema = require("../models/pricingSchema");
-    const timeNow = Date.now();
 
     try {
         const files = await getSeedFiles();
@@ -295,7 +292,7 @@ router.post("/pricing", async (req, res) => {
                 file.match(/performance_(\w+)_(\w+(-\w+)?)\.csv/) || [];
 
             const pricingModel = mongoose.model(
-                `performance-${market}-${timeNow}`,
+                `performance-${market.toLowerCase()}`,
                 pricingSchema
             );
 

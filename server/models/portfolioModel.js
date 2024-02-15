@@ -27,4 +27,4 @@ const portfolioSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model(`portfolio`, portfolioSchema);
+module.exports = mongoose.model("portfolio", portfolioSchema);

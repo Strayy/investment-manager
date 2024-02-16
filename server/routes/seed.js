@@ -10,7 +10,6 @@ const csvtojson = require("csvtojson");
 const fs = require("fs").promises;
 const seedFolder = "./seed_data";
 
-require("dotenv").config();
 const localPort = process.env.PORT;
 
 // Function to return all seed files found in the /seed_data/ directory

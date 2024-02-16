@@ -17,6 +17,44 @@ router.get("/getTrades", async (req, res) => {
     }
 });
 
+// RETURN MOST RECENT TRANSACTIONS. RETURNS FOR ALL INVESTMENTS IF STOCKID NOT SPECIFIED, OR SINGLE STOCK IF SPECIFIED
+router.get("/getMostRecentTransaction", async (req, res) => {
+    try {
+        if (!req.query.stockId) {
+            const distinctValues = await portfolioModel.distinct("stockId", {
+                userId: req.query.userId,
+            });
+
+            let latestTransactions = {};
+
+            await Promise.all(
+                distinctValues.map(async (stock) => {
+                    const data = await portfolioModel
+                        .find({
+                            userId: req.query.userId,
+                            stockId: stock,
+                        })
+                        .sort({ date: -1 });
+
+                    latestTransactions[stock] = data[0];
+                })
+            );
+
+            res.status(200).json(latestTransactions);
+        } else {
+            const data = await portfolioModel
+                .find({ userId: req.query.userId, stockId: req.query.stockId })
+                .sort({ date: -1 });
+
+            const latestTransaction = { [req.query.stockId]: data[0] };
+
+            res.status(200).json(latestTransaction);
+        }
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // TODO - Add endpoint for adding transaction/trade
 // ADD TRADE TO TRANSACTIONS
 router.post("/addTrade", async (req, res) => {

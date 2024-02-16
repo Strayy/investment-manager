@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 // RETURN RECENT PRICING INFORMATION FOR A GIVEN TICKER
 router.get("/recentPricing", async (req, res) => {
@@ -8,45 +9,88 @@ router.get("/recentPricing", async (req, res) => {
         const [exchange, ticker] = req.query.stock.split("_");
         const currentYear = new Date().getFullYear();
 
-        const allData = await mongoose.connection
-            .collection(`performance-${exchange.toLowerCase()}`)
+        const performanceModel = await mongoose.connection.collection(
+            `performance-${exchange.toLowerCase()}`
+        );
+
+        const allData = await performanceModel
             .find({ stock: ticker })
             .sort({ date: -1 })
             .toArray();
 
-        const dailyChangePercent =
-            ((allData[0].adjClose - allData[1].adjClose) /
-                allData[1].adjClose) *
-            100;
+        let mostRecentPricing;
+        let dailyChangePercent;
+        let ytdChangePercent;
+        let calYearData;
 
-        const calYearData = await mongoose.connection
-            .collection(`performance-${exchange.toLowerCase()}`)
-            .find({
-                stock: ticker,
-                date: {
-                    $gte: new Date(`${currentYear}-01-01`),
-                    $lt: new Date(`${currentYear + 1}-01-01`),
-                },
-            })
-            .sort({ date: 1 })
-            .toArray();
+        async function updatePricing() {
+            await axios.post(
+                `http://localhost:${process.env.PORT}/api/stock/updatePricing?stock=${req.query.stock}`
+            );
 
-        const ytdChangePercent =
-            (allData[0].adjClose / calYearData[0].adjClose - 1) * 100;
+            await calculateChangePercents();
+        }
 
-        res.status(400).json({
-            latestPrice: allData[0],
+        async function calculateChangePercents() {
+            const allDataUpdated = await performanceModel
+                .find({ stock: ticker })
+                .sort({ date: -1 })
+                .toArray();
+
+            mostRecentPricing = allDataUpdated;
+
+            dailyChangePercent =
+                ((mostRecentPricing[0].adjClose -
+                    mostRecentPricing[1].adjClose) /
+                    mostRecentPricing[1].adjClose) *
+                100;
+
+            calYearData = await mongoose.connection
+                .collection(`performance-${exchange.toLowerCase()}`)
+                .find({
+                    stock: ticker,
+                    date: {
+                        $gte: new Date(`${currentYear}-01-01`),
+                        $lt: new Date(`${currentYear + 1}-01-01`),
+                    },
+                })
+                .sort({ date: 1 })
+                .toArray();
+
+            ytdChangePercent =
+                (mostRecentPricing[0].adjClose / calYearData[0].adjClose - 1) *
+                100;
+        }
+
+        if (Object.keys(allData).length === 0) {
+            await updatePricing();
+        } else {
+            const latestDate = new Date();
+            latestDate.setDate(latestDate.getDate() - 5);
+
+            if (new Date(allData[0].date) < latestDate) {
+                await updatePricing();
+            } else {
+                mostRecentPricing = allData;
+                await calculateChangePercents();
+            }
+        }
+
+        res.status(200).json({
+            latestPrice: mostRecentPricing[0],
             ytd: {
                 percentage: ytdChangePercent,
-                actual: allData[0].adjClose - calYearData[0].adjClose,
+                actual: mostRecentPricing[0].adjClose - calYearData[0].adjClose,
             },
             dailyChange: {
                 percentage: dailyChangePercent,
-                actual: allData[0].adjClose - allData[1].adjClose,
+                actual:
+                    mostRecentPricing[0].adjClose -
+                    mostRecentPricing[1].adjClose,
             },
         });
     } catch (err) {
-        res.status(200).json({ message: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 
@@ -126,7 +170,7 @@ router.post("/updatePricing", async (req, res) => {
             }
         }
 
-        res.status(400).json({
+        res.status(200).json({
             message: `Updated pricing data for ${exchange}_${ticker} successfully`,
             from: latestDate.toISOString().split("T")[0],
             to:
@@ -136,7 +180,7 @@ router.post("/updatePricing", async (req, res) => {
             failedImport: failedImport,
         });
     } catch (err) {
-        res.status(200).json({ message: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 

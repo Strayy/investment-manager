@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-mongoose.pluralize(null);
-const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
-
 const path = require("path");
 const csvtojson = require("csvtojson");
 const fs = require("fs").promises;
+
 const seedFolder = "./seed_data";
 
+mongoose.pluralize(null);
 const localPort = process.env.PORT;
 
 // Function to return all seed files found in the /seed_data/ directory
@@ -218,7 +217,7 @@ router.post("/portfolio", async (req, res) => {
             seed_location: portfolioModel.collection.name,
         });
     } catch (err) {
-        res.status(200).json({ message: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 

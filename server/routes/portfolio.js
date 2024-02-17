@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bodyParser = require("body-parser");
+const axios = require("axios");
 
 router.use(bodyParser.json());
 
@@ -75,6 +76,8 @@ router.get("/getHoldings", async (req, res) => {
             userId: req.query.userId,
         });
         let holdings = {};
+        let totalPortfolioValue = 0;
+        let latestPricing = {};
 
         await Promise.all(
             distinctValues.map(async (stock) => {
@@ -109,10 +112,31 @@ router.get("/getHoldings", async (req, res) => {
                     amount: amount,
                     averageBuyPrice: Number(avgPrice.toFixed(2)),
                 };
+
+                const recentPricing = await axios.get(
+                    `http://localhost:${process.env.PORT}/api/stock/recentPricing?stock=${stock}`
+                );
+
+                latestPricing[stock] = recentPricing.data.latestPrice.adjClose;
+
+                totalPortfolioValue +=
+                    recentPricing.data.latestPrice.adjClose * amount;
             })
         );
 
-        res.status(200).json(holdings);
+        await Promise.all(
+            distinctValues.map((stock) => {
+                holdings[stock]["percentage"] =
+                    ((latestPricing[stock] * holdings[stock].amount) /
+                        totalPortfolioValue) *
+                    100;
+            })
+        );
+
+        res.status(200).json({
+            portfolio: { totalValue: totalPortfolioValue },
+            holdings: holdings,
+        });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

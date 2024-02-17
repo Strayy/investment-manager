@@ -18,24 +18,49 @@ function Portfolio() {
 
             let portfolioData: any = {};
 
-            Object.entries(dataJson).forEach((stock: any) => {
-                const [exchange, ticker] = stock[0].split("_");
+            for (const [stockKey, stockData] of Object.entries(
+                dataJson.holdings
+            ) as [string, any]) {
+                const [exchange, ticker] = stockKey.split("_");
+
+                const pricingData = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/recentPricing?stock=${stockKey}`
+                );
+
+                const pricingDataJson = await pricingData.json();
+
+                const latestTransactionData = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/getMostRecentTransaction?userId=TEST-USER-ID&stockId=${stockKey}`
+                );
+
+                const latestTransactionJson =
+                    await latestTransactionData.json();
 
                 portfolioData[exchange] = {
                     data: [
                         [
                             ticker,
-                            stock[1]["amount"],
-                            "Price",
-                            "Daily Change",
-                            "YTD",
-                            stock[1]["averageBuyPrice"],
-                            "Portfolio",
-                            "Last Transaction",
+                            stockData["amount"],
+                            pricingDataJson["latestPrice"]["adjClose"],
+                            `${
+                                Math.round(
+                                    pricingDataJson["dailyChange"][
+                                        "percentage"
+                                    ] * 100
+                                ) / 100
+                            }%`,
+                            `${
+                                Math.round(
+                                    pricingDataJson["ytd"]["percentage"] * 100
+                                ) / 100
+                            }%`,
+                            stockData["averageBuyPrice"],
+                            `${Math.round(stockData["percentage"] * 10) / 10}%`,
+                            latestTransactionJson[stockKey].date.split("T")[0],
                         ],
                     ],
                 };
-            });
+            }
 
             updatePortfolioData(portfolioData);
         }

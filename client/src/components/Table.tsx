@@ -1,4 +1,5 @@
-// TODO Fix TS imports to use ITableData/create new ISectionData interface
+// TODO - Fix TS imports to use ITableData/create new ISectionData interface
+// FIXME - Incorporate keys into array elements
 import ITableData from "../types/tableData";
 
 function Table(data: any) {

@@ -1,6 +1,6 @@
 .returns-table {
     width: 100%;
-    font-family: 'Golos Text', Arial, Helvetica, sans-serif;
+    font-family: "Golos Text", Arial, Helvetica, sans-serif;
     border-spacing: 0;
 
     tr {
@@ -16,7 +16,7 @@
             background-color: rgba(0, 41, 69, 0.5);
             font-weight: 600;
         }
-    
+
         th {
             font-weight: 300;
             padding: calc(0.5em - 2px) 0.5em 0.5em 0.5em;
@@ -37,6 +37,31 @@
 
             &.bold-data {
                 font-weight: 600;
+            }
+
+            &.data-styled p {
+                padding: 1px 5px;
+                width: min-content;
+                height: min-content;
+                margin: auto;
+                border: 2px solid;
+                border-radius: 2.5px;
+            }
+
+            &.test-true p {
+                background-color: #195c1c;
+                border-color: #38a700;
+            }
+
+            &.test-false p {
+                background-color: #792a2a;
+                border-color: #ef3e36;
+            }
+
+            &.test-neutral p {
+                background-color: #bababa;
+                border-color: #808080;
+                color: #000000;
             }
         }
     }

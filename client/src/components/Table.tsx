@@ -40,18 +40,34 @@ function Table(data: any) {
 
                     sectionData.forEach(
                         (sectionDataItem: string | number, index: number) => {
+                            const dataValueForStyling = Number(
+                                String(sectionDataItem).replace(/[^-.0-9]/g, "")
+                            );
+
                             sectionRow.push(
                                 <td
-                                    className={
+                                    className={`${
                                         data.data.settings.boldDataColumns &&
                                         data.data.settings.boldDataColumns.includes(
                                             index
                                         )
                                             ? "bold-data"
                                             : ""
-                                    }
+                                    }${
+                                        data.data.settings
+                                            .styleColumnsByValue &&
+                                        data.data.settings.styleColumnsByValue.includes(
+                                            index
+                                        )
+                                            ? dataValueForStyling > 0
+                                                ? "data-styled test-true"
+                                                : dataValueForStyling < 0
+                                                ? "data-styled test-false"
+                                                : "data-styled test-neutral"
+                                            : ""
+                                    }`}
                                 >
-                                    {sectionDataItem}
+                                    <p>{sectionDataItem}</p>
                                 </td>
                             );
                         }

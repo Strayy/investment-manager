@@ -91,6 +91,7 @@ function Portfolio() {
                 sortBySection: false,
                 filterBySection: false,
                 boldDataColumns: [0],
+                styleColumnsByValue: [3, 4],
             },
         });
     }, [portfolioData]);

@@ -4,8 +4,7 @@ interface ITableData {
         [key: string]: {
             importance?: number;
             heading?: string;
-            data: (string | number | null)[][];
-            // FIXME - Remove null type declaration once data processing completed in Portfolio.tsx
+            data: (string | number)[][];
         };
     };
     settings?: {
@@ -18,6 +17,7 @@ interface ITableData {
         sortBySection?: boolean;
         filterBySection?: boolean;
         boldDataColumns?: number[];
+        styleColumnsByValue?: number[];
     };
 }
 

@@ -8,6 +8,7 @@ import { ITableData } from "../types/tableData";
 function Portfolio() {
     const [portfolioData, updatePortfolioData] = useState<any>(null);
     const [tableData, updateTableData] = useState<ITableData | null>(null);
+    const [isLoading, updateIsLoading] = useState<boolean>(true);
 
     // Returns and formats data to be passed to Table component upon page load
     useEffect(() => {
@@ -65,6 +66,7 @@ function Portfolio() {
             }
 
             updatePortfolioData(portfolioData);
+            updateIsLoading(false);
         }
 
         getPortfolioData();
@@ -113,7 +115,9 @@ function Portfolio() {
                 </div>
             </div>
             <div className="portfolio-elements">
-                <Table data={tableData} />
+                <div className="table">
+                    <Table data={tableData} isLoading={isLoading} />
+                </div>
                 <div className="graph">
                     <Graph />
                 </div>

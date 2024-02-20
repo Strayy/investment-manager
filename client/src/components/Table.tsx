@@ -1,8 +1,14 @@
 import { ITableData, Section } from "../types/tableData";
 
-function Table({ data }: { data: ITableData | null }): JSX.Element {
-    console.log(data);
+import SkeletonLoading from "./SkeletonLoading";
 
+function Table({
+    data,
+    isLoading,
+}: {
+    data: ITableData | null;
+    isLoading?: boolean;
+}): JSX.Element {
     // Style table cell based on styleColumnsByValue and columnStyling data
     function styleCell(dataContent: string | number, columnIndex: number) {
         // Returns the corresponding array index in styleColumnsByValue for cell index. I.e., first column (cell index 0) in [[1], [2], [0]] equals 2. Returns -1 if it doesn't exist.
@@ -196,15 +202,23 @@ function Table({ data }: { data: ITableData | null }): JSX.Element {
     }
 
     return (
-        <div className="table">
-            <table className="returns-table">
+        <div className="table-component">
+            <table>
                 <tbody>
                     {data !== null && (
                         <>
                             {data.headings && (
                                 <tr className="headings">{returnHeadings()}</tr>
                             )}
-                            {returnSections()}
+                            {isLoading ? (
+                                <SkeletonLoading
+                                    skeletonStyle="table-rows"
+                                    tableColumns={8}
+                                    tableRows={4}
+                                />
+                            ) : (
+                                returnSections()
+                            )}
                         </>
                     )}
                 </tbody>

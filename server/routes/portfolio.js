@@ -10,6 +10,10 @@ const portfolioModel = require("../models/portfolioModel");
 // RETURN LIST OF TRADES
 router.get("/getTrades", async (req, res) => {
     try {
+        if (!req.query.userId) {
+            throw new Error("No userId specified in GET request");
+        }
+
         const data = await portfolioModel.find({ userId: req.query.userId });
 
         res.status(200).json(data);
@@ -21,6 +25,10 @@ router.get("/getTrades", async (req, res) => {
 // RETURN MOST RECENT TRANSACTIONS. RETURNS FOR ALL INVESTMENTS IF STOCKID NOT SPECIFIED, OR SINGLE STOCK IF SPECIFIED
 router.get("/getMostRecentTransaction", async (req, res) => {
     try {
+        if (!req.query.userId) {
+            throw new Error("Missing userId in request");
+        }
+
         if (!req.query.stockId) {
             const distinctValues = await portfolioModel.distinct("stockId", {
                 userId: req.query.userId,
@@ -48,6 +56,8 @@ router.get("/getMostRecentTransaction", async (req, res) => {
                 .sort({ date: -1 });
 
             const latestTransaction = { [req.query.stockId]: data[0] };
+
+            console.log(Object.values(latestTransaction).length);
 
             res.status(200).json(latestTransaction);
         }

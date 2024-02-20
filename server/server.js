@@ -37,6 +37,8 @@ app.get("/api/test", async (req, res) => {
 const routes = require("./routes/routes");
 app.use("/api", routes);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
+module.exports = { app, server };

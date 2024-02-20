@@ -6,8 +6,6 @@ function SkeletonLoading({
     tableColumns,
     tableRows,
 }: SkeletonLoadingProps): JSX.Element {
-    console.log(skeletonStyle);
-
     function generateTableRows(): JSX.Element {
         let tableRowElements: JSX.Element[] = [];
 

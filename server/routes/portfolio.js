@@ -57,8 +57,6 @@ router.get("/getMostRecentTransaction", async (req, res) => {
 
             const latestTransaction = { [req.query.stockId]: data[0] };
 
-            console.log(Object.values(latestTransaction).length);
-
             res.status(200).json(latestTransaction);
         }
     } catch (err) {

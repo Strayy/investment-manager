@@ -1,0 +1,14 @@
+{
+    "name": "investment-tracker",
+    "version": "1.0.0",
+    "description": "Project for tracking and managing investments across various financial instruments and exchanges.",
+    "scripts": {
+        "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
+        "test": "concurrently \"cd server && npm test\""
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

@@ -6,8 +6,8 @@ function Table(data: any) {
     function returnHeadings() {
         let thElements: JSX.Element[] = [];
 
-        data.data.headings.forEach((heading: string) => {
-            thElements.push(<th>{heading}</th>);
+        data.data.headings.forEach((heading: string, index: number) => {
+            thElements.push(<th key={`heading-${index}`}>{heading}</th>);
         });
 
         return thElements;
@@ -17,67 +17,88 @@ function Table(data: any) {
         let sections: JSX.Element[][][] = [];
 
         if (data.data.sections) {
-            Object.entries(data.data.sections).forEach((section: any) => {
-                const sectionElement: JSX.Element[][] = [];
+            Object.entries(data.data.sections).forEach(
+                (section: any, sectionIndex: number) => {
+                    const sectionElement: JSX.Element[][] = [];
 
-                sectionElement.push([
-                    <tr
-                        className={
-                            section[1].importance &&
-                            `importance-${section[1].importance}`
-                        }
-                    >
-                        {section[1].heading && (
-                            <td colSpan={section[1].data[0].length}>
-                                {section[1].heading}
-                            </td>
-                        )}
-                    </tr>,
-                ]);
-
-                section[1].data.forEach((sectionData: (string | number)[]) => {
-                    const sectionRow: JSX.Element[] = [];
-
-                    sectionData.forEach(
-                        (sectionDataItem: string | number, index: number) => {
-                            const dataValueForStyling = Number(
-                                String(sectionDataItem).replace(/[^-.0-9]/g, "")
-                            );
-
-                            sectionRow.push(
-                                <td
-                                    className={`${
-                                        data.data.settings.boldDataColumns &&
-                                        data.data.settings.boldDataColumns.includes(
-                                            index
-                                        )
-                                            ? "bold-data"
-                                            : ""
-                                    }${
-                                        data.data.settings
-                                            .styleColumnsByValue &&
-                                        data.data.settings.styleColumnsByValue.includes(
-                                            index
-                                        )
-                                            ? dataValueForStyling > 0
-                                                ? "data-styled test-true"
-                                                : dataValueForStyling < 0
-                                                ? "data-styled test-false"
-                                                : "data-styled test-neutral"
-                                            : ""
-                                    }`}
-                                >
-                                    <p>{sectionDataItem}</p>
+                    sectionElement.push([
+                        <tr
+                            key={`section-${sectionIndex}-heading`}
+                            className={
+                                section[1].importance &&
+                                `importance-${section[1].importance}`
+                            }
+                        >
+                            {section[1].heading && (
+                                <td colSpan={section[1].data[0].length}>
+                                    {section[1].heading}
                                 </td>
+                            )}
+                        </tr>,
+                    ]);
+
+                    section[1].data.forEach(
+                        (
+                            sectionData: (string | number)[],
+                            rowIndex: number
+                        ) => {
+                            const sectionRow: JSX.Element[] = [];
+
+                            sectionData.forEach(
+                                (
+                                    sectionDataItem: string | number,
+                                    index: number
+                                ) => {
+                                    const dataValueForStyling = Number(
+                                        String(sectionDataItem).replace(
+                                            /[^-.0-9]/g,
+                                            ""
+                                        )
+                                    );
+
+                                    sectionRow.push(
+                                        <td
+                                            key={`section-${sectionIndex}-row-${rowIndex}-column-${index}`}
+                                            className={`${
+                                                data.data.settings
+                                                    .boldDataColumns &&
+                                                data.data.settings.boldDataColumns.includes(
+                                                    index
+                                                )
+                                                    ? "bold-data"
+                                                    : ""
+                                            }${
+                                                data.data.settings
+                                                    .styleColumnsByValue &&
+                                                data.data.settings.styleColumnsByValue.includes(
+                                                    index
+                                                )
+                                                    ? dataValueForStyling > 0
+                                                        ? "data-styled test-true"
+                                                        : dataValueForStyling <
+                                                          0
+                                                        ? "data-styled test-false"
+                                                        : "data-styled test-neutral"
+                                                    : ""
+                                            }`}
+                                        >
+                                            <p>{sectionDataItem}</p>
+                                        </td>
+                                    );
+                                }
                             );
+
+                            sectionElement.push([
+                                <tr key={`section-${sectionIndex}-row`}>
+                                    {sectionRow}
+                                </tr>,
+                            ]);
                         }
                     );
 
-                    sectionElement.push([<tr>{sectionRow}</tr>]);
-                });
-
-                sections.push(sectionElement);
-            });
+                    sections.push(sectionElement);
+                }
+            );
 
             return sections;
         }

@@ -1,11 +1,25 @@
-interface ITableData {
+export type Section = {
+    importance?: number;
+    heading?: string;
+    data: (string | number)[][];
+};
+
+type AllowedStyles =
+    | "bold"
+    | "italics"
+    | "underline"
+    | "color"
+    | "percentage"
+    | "iconsFront"
+    | "iconsEnd"
+    | "stripNegativeSign"
+    | "alignLeft"
+    | "alignRight";
+
+export interface ITableData {
     headings?: string[];
     sections?: {
-        [key: string]: {
-            importance?: number;
-            heading?: string;
-            data: (string | number)[][];
-        };
+        [key: string]: Section;
     };
     settings?: {
         collapsable?: boolean;
@@ -16,9 +30,7 @@ interface ITableData {
         lockSectionHeadingOnScroll?: boolean;
         sortBySection?: boolean;
         filterBySection?: boolean;
-        boldDataColumns?: number[];
-        styleColumnsByValue?: number[];
+        styleColumnsByValue?: number[][];
+        columnStyling?: AllowedStyles[][];
     };
 }
-
-export default ITableData;

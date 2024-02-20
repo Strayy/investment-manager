@@ -35,33 +35,75 @@
                 text-align: center;
             }
 
-            &.bold-data {
-                font-weight: 600;
-            }
+            p {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 0.55em;
 
-            &.data-styled p {
-                padding: 1px 5px;
-                width: min-content;
-                height: min-content;
-                margin: auto;
-                border: 2px solid;
-                border-radius: 2.5px;
-            }
+                i {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
 
-            &.test-true p {
-                background-color: #195c1c;
-                border-color: #38a700;
-            }
+                &.align-left-data {
+                    justify-content: flex-start;
+                }
 
-            &.test-false p {
-                background-color: #792a2a;
-                border-color: #ef3e36;
-            }
+                &.align-right-data {
+                    justify-content: flex-end;
+                }
 
-            &.test-neutral p {
-                background-color: #bababa;
-                border-color: #808080;
-                color: #000000;
+                &.bold-data {
+                    font-weight: 600;
+                }
+
+                &.italics-data {
+                    font-style: italic;
+                }
+
+                &.underline-data {
+                    text-decoration: underline;
+                }
+
+                &.color-data {
+                    padding: 1px 5px;
+                    width: min-content;
+                    height: min-content;
+                    margin: auto;
+                    border: 2px solid;
+                    border-radius: 2.5px;
+
+                    &.style-positive {
+                        background-color: #195c1c;
+                        border-color: #38a700;
+
+                        i {
+                            color: #70ff29;
+                        }
+                    }
+
+                    &.style-negative {
+                        background-color: #792a2a;
+                        border-color: #ef3e36;
+
+                        i {
+                            color: #ff6661;
+                        }
+                    }
+        
+                    &.style-neutral {
+                        background-color: #bababa;
+                        border-color: #808080;
+                        color: #000000;
+
+                        i {
+                            color: #808080;
+                        }
+                    }
+                }
             }
         }
     }

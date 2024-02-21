@@ -4,10 +4,10 @@
     "description": "Project for tracking and managing investments across various financial instruments and exchanges.",
     "scripts": {
         "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
-        "test": "concurrently \"cd server && npm test\""
+        "test": "concurrently \"cd server && npm test\"",
+        "lint": "concurrently \"cd client && npm run lint\" \"cd server && npm run lint\"",
+        "prettify": "concurrently \"cd client && npm run format\" \"cd server && npm run format\""
     },
-    "author": "",
-    "license": "ISC",
     "devDependencies": {
         "concurrently": "^8.2.2"
     }

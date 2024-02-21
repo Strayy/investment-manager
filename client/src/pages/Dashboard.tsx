@@ -4,11 +4,11 @@ import Watchlist from "../components/Watchlist";
 
 function Dashboard() {
     return (
-        <div className="dashboard">
-            <div className="upper-dashboard-container">
+        <div className='dashboard'>
+            <div className='upper-dashboard-container'>
                 <Watchlist />
             </div>
-            <div className="lower-dashboard-container">
+            <div className='lower-dashboard-container'>
                 <div>
                     <Graph />
                 </div>

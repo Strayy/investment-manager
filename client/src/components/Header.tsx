@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 
 function Header() {
     return (
-        <div className="header-container">
+        <div className='header-container'>
             <span>
-                <Link to="/">
+                <Link to='/'>
                     <p>Investment Management Dashboard</p>
                 </Link>
             </span>
@@ -12,7 +12,7 @@ function Header() {
                 <select>
                     <option>USD $</option>
                 </select>
-                <input type="text" placeholder="Search..." />
+                <input type='text' placeholder='Search...' />
             </span>
         </div>
     );

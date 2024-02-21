@@ -5,11 +5,11 @@ import NavBar from "../components/Navbar";
 
 function Layout() {
     return (
-        <div className="layout">
-            <div className="navbar">
+        <div className='layout'>
+            <div className='navbar'>
                 <NavBar />
             </div>
-            <div className="content">
+            <div className='content'>
                 <Header />
                 <Outlet />
             </div>

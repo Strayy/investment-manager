@@ -1,5 +1,5 @@
-import hexRgb from 'hex-rgb';
-import { useEffect, useState } from 'react';
+import hexRgb from "hex-rgb";
+import { useEffect, useState } from "react";
 
 function Watchlist() {
     const [investments, setInvestments] = useState<
@@ -19,8 +19,7 @@ function Watchlist() {
             color: "#cc0000",
             currentPrice: "$185.90",
             change: 2.97,
-            companyLogo:
-                "https://asset.brandfetch.io/id2S-kXbuK/iduZOzPw94.png",
+            companyLogo: "https://asset.brandfetch.io/id2S-kXbuK/iduZOzPw94.png",
             companyWebsite: "https://tesla.com/",
         },
         {
@@ -29,8 +28,7 @@ function Watchlist() {
             color: "#0067b8",
             currentPrice: "$289.84",
             change: 2.24,
-            companyLogo:
-                "https://asset.brandfetch.io/idchmboHEZ/id0K98Gag1.png",
+            companyLogo: "https://asset.brandfetch.io/idchmboHEZ/id0K98Gag1.png",
             companyWebsite: "https://microsoft.com/",
         },
         {
@@ -39,8 +37,7 @@ function Watchlist() {
             color: "#0066CC",
             currentPrice: "$165.56",
             change: 3.41,
-            companyLogo:
-                "https://asset.brandfetch.io/idnrCPuv87/id3SVF6ez4.png",
+            companyLogo: "https://asset.brandfetch.io/idnrCPuv87/id3SVF6ez4.png",
             companyWebsite: "https://apple.com/",
         },
     ]);
@@ -69,7 +66,7 @@ function Watchlist() {
             watchListItems.push(
                 <div
                     key={item.ticker}
-                    className="watchlist-item"
+                    className='watchlist-item'
                     style={{
                         backgroundImage: `linear-gradient(to top right, rgba(
                             ${hexRgb(item.color).red - 100},
@@ -81,42 +78,39 @@ function Watchlist() {
                         border: `2px solid ${item.color}`,
                     }}
                 >
-                    <i className="fi fi-ss-star"></i>
-                    <div className="watchlist-item-inner">
+                    <i className='fi fi-ss-star'></i>
+                    <div className='watchlist-item-inner'>
                         <span>
-                            <p className="ticker">{item.ticker}</p>
-                            <p className="name">{item.name}</p>
+                            <p className='ticker'>{item.ticker}</p>
+                            <p className='name'>{item.name}</p>
                         </span>
                         <span>
-                            <p className="current-price">{item.currentPrice}</p>
-                            <p className="change">
+                            <p className='current-price'>{item.currentPrice}</p>
+                            <p className='change'>
                                 {item.change !== 0 ? (
                                     item.change > 0 ? (
-                                        <i className="fi fi-ss-arrow-trend-up"></i>
+                                        <i className='fi fi-ss-arrow-trend-up'></i>
                                     ) : (
-                                        <i className="fi fi-ss-arrow-trend-down"></i>
+                                        <i className='fi fi-ss-arrow-trend-down'></i>
                                     )
                                 ) : (
-                                    <i className="fi fi-ss-horizontal-rule"></i>
+                                    <i className='fi fi-ss-horizontal-rule'></i>
                                 )}
                                 {Math.abs(item.change)}%
                             </p>
                         </span>
                     </div>
                     <a
-                        title="Visit Company Website"
+                        title='Visit Company Website'
                         href={item.companyWebsite}
-                        target="_blank"
-                        rel="noreferrer"
+                        target='_blank'
+                        rel='noreferrer'
                     >
-                        <div className="company-logo">
-                            <img
-                                src={item.companyLogo}
-                                alt={item.name + " Logo"}
-                            />
+                        <div className='company-logo'>
+                            <img src={item.companyLogo} alt={item.name + " Logo"} />
                         </div>
                     </a>
-                </div>
+                </div>,
             );
         });
 
@@ -124,9 +118,9 @@ function Watchlist() {
     }
 
     return (
-        <div className="watchlist-container">
+        <div className='watchlist-container'>
             {investments.length === 0 ? (
-                <div className="no-watchlist-item">
+                <div className='no-watchlist-item'>
                     <p>Add Watchlist Item</p>
                 </div>
             ) : (

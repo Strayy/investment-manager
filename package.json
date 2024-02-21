@@ -6,9 +6,32 @@
         "start": "concurrently \"cd client && npm start\" \"cd server && npm start\"",
         "test": "concurrently \"cd server && npm test\"",
         "lint": "concurrently \"cd client && npm run lint\" \"cd server && npm run lint\"",
-        "prettify": "concurrently \"cd client && npm run format\" \"cd server && npm run format\""
+        "prettify": "concurrently \"cd client && npm run format\" \"cd server && npm run format\"",
+        "prepare": "husky"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "client/**/*.{ts,tsx}": [
+            "npm --prefix ./client run lint",
+            "git add"
+        ],
+        "client/**/*.{ts,tsx,scss}": [
+            "npm --prefix ./client run format",
+            "git add"
+        ],
+        "server/**/*.{js}": [
+            "npm --prefix ./server run lint",
+            "npm --prefix ./server run format",
+            "git add"
+        ]
     },
     "devDependencies": {
-        "concurrently": "^8.2.2"
+        "concurrently": "^8.2.2",
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.2"
     }
 }

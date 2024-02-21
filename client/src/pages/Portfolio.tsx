@@ -16,32 +16,32 @@ function Portfolio() {
             // Returns list of portfolio holdings for userId
             // TODO Integrate userId functionality
             const rawPortfolioData = await fetch(
-                `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/getHoldings?userId=TEST-USER-ID`
+                `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/getHoldings?userId=TEST-USER-ID`,
             );
             const dataJson = await rawPortfolioData.json();
 
             let portfolioData: any = {};
 
             // Loops through each stock in portfolio
-            for (const [stockKey, stockData] of Object.entries(
-                dataJson.holdings
-            ) as [string, any]) {
+            for (const [stockKey, stockData] of Object.entries(dataJson.holdings) as [
+                string,
+                any,
+            ]) {
                 const [exchange, ticker] = stockKey.split("_");
 
                 // Returns current pricing of stock
                 const pricingData = await fetch(
-                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/recentPricing?stock=${stockKey}`
+                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/recentPricing?stock=${stockKey}`,
                 );
 
                 const pricingDataJson = await pricingData.json();
 
                 // Returns the most recent transaction for a given stock
                 const latestTransactionData = await fetch(
-                    `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/getMostRecentTransaction?userId=TEST-USER-ID&stockId=${stockKey}`
+                    `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/getMostRecentTransaction?userId=TEST-USER-ID&stockId=${stockKey}`,
                 );
 
-                const latestTransactionJson =
-                    await latestTransactionData.json();
+                const latestTransactionJson = await latestTransactionData.json();
 
                 // Formats data to be added to portfolioData
                 portfolioData[exchange] = {
@@ -50,13 +50,8 @@ function Portfolio() {
                             ticker,
                             stockData["amount"],
                             pricingDataJson["latestPrice"]["adjClose"],
-                            Math.round(
-                                pricingDataJson["dailyChange"]["percentage"] *
-                                    100
-                            ) / 100,
-                            Math.round(
-                                pricingDataJson["ytd"]["percentage"] * 100
-                            ) / 100,
+                            Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,
+                            Math.round(pricingDataJson["ytd"]["percentage"] * 100) / 100,
                             stockData["averageBuyPrice"],
                             Math.round(stockData["percentage"] * 10) / 10,
                             latestTransactionJson[stockKey].date.split("T")[0],
@@ -106,19 +101,19 @@ function Portfolio() {
     }, [portfolioData]);
 
     return (
-        <div className="portfolio">
-            <div className="portfolio-title">
+        <div className='portfolio'>
+            <div className='portfolio-title'>
                 <h1>Portfolio</h1>
                 <div>
                     <div>Buy</div>
                     <div>Sell</div>
                 </div>
             </div>
-            <div className="portfolio-elements">
-                <div className="table">
+            <div className='portfolio-elements'>
+                <div className='table'>
                     <Table data={tableData} isLoading={isLoading} />
                 </div>
-                <div className="graph">
+                <div className='graph'>
                     <Graph />
                 </div>
             </div>

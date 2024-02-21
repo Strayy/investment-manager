@@ -15,18 +15,15 @@ function SkeletonLoading({
             for (let j = 0; j < tableColumns; j++) {
                 tableCellElements.push(
                     <td key={`skeleton-loading-table-cell-${j}`}>
-                        <div className="loading-element"></div>
-                    </td>
+                        <div className='loading-element'></div>
+                    </td>,
                 );
             }
 
             tableRowElements.push(
-                <tr
-                    className="skeleton-loading"
-                    key={`skeleton-loading-table-row-${i}`}
-                >
+                <tr className='skeleton-loading' key={`skeleton-loading-table-row-${i}`}>
                     {tableCellElements}
-                </tr>
+                </tr>,
             );
         }
 
@@ -36,7 +33,7 @@ function SkeletonLoading({
     return skeletonStyle === "table-rows" ? (
         generateTableRows()
     ) : (
-        <div className="skeleton-loading"></div>
+        <div className='skeleton-loading'></div>
     );
 }
 

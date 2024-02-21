@@ -6,9 +6,7 @@ describe("GET /getTrades", () => {
         let response;
 
         beforeAll(async () => {
-            response = await request(app).get(
-                "/api/portfolio/getTrades?userId=TEST-USER-ID"
-            );
+            response = await request(app).get("/api/portfolio/getTrades?userId=TEST-USER-ID");
         });
 
         it("responds with status code 200", () => {
@@ -16,9 +14,7 @@ describe("GET /getTrades", () => {
         });
 
         it("responds with json object", () => {
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json")
-            );
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
         });
 
         it("responds with list of trades", () => {
@@ -34,9 +30,7 @@ describe("GET /getTrades", () => {
         let response;
 
         beforeAll(async () => {
-            response = await request(app).get(
-                "/api/portfolio/getTrades?userId=NO-TRADES"
-            );
+            response = await request(app).get("/api/portfolio/getTrades?userId=NO-TRADES");
         });
 
         it("responds with status code 200", () => {
@@ -60,9 +54,7 @@ describe("GET /getTrades", () => {
         });
 
         it("responds with json error message", () => {
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json")
-            );
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
 
             expect(response.body).toEqual({
                 message: "No userId specified in GET request",
@@ -81,7 +73,7 @@ describe("GET /getMostRecentTransaction", () => {
 
         beforeAll(async () => {
             response = await request(app).get(
-                "/api/portfolio/getMostRecentTransaction?userId=TEST-USER-ID&stockId=ASX_CAR"
+                "/api/portfolio/getMostRecentTransaction?userId=TEST-USER-ID&stockId=ASX_CAR",
             );
         });
 
@@ -90,9 +82,7 @@ describe("GET /getMostRecentTransaction", () => {
         });
 
         it("responds with json object", () => {
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json")
-            );
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
         });
 
         it("responds with single trade", () => {
@@ -105,7 +95,7 @@ describe("GET /getMostRecentTransaction", () => {
 
         beforeAll(async () => {
             response = await request(app).get(
-                "/api/portfolio/getMostRecentTransaction?userId=NO-TRADES&stockId=ASX_CAR"
+                "/api/portfolio/getMostRecentTransaction?userId=NO-TRADES&stockId=ASX_CAR",
             );
         });
 
@@ -123,7 +113,7 @@ describe("GET /getMostRecentTransaction", () => {
 
         beforeAll(async () => {
             response = await request(app).get(
-                "/api/portfolio/getMostRecentTransaction?userId=TEST-USER-ID"
+                "/api/portfolio/getMostRecentTransaction?userId=TEST-USER-ID",
             );
         });
 
@@ -132,9 +122,7 @@ describe("GET /getMostRecentTransaction", () => {
         });
 
         it("responds with json object", () => {
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json")
-            );
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
         });
 
         it("responds with list of most recent trade for each ticker", () => {
@@ -148,9 +136,7 @@ describe("GET /getMostRecentTransaction", () => {
         let response;
 
         beforeAll(async () => {
-            response = await request(app).get(
-                "/api/portfolio/getMostRecentTransaction"
-            );
+            response = await request(app).get("/api/portfolio/getMostRecentTransaction");
         });
 
         it("responds with status code 400", () => {
@@ -158,9 +144,7 @@ describe("GET /getMostRecentTransaction", () => {
         });
 
         it("responds with json error message", () => {
-            expect(response.headers["content-type"]).toEqual(
-                expect.stringContaining("json")
-            );
+            expect(response.headers["content-type"]).toEqual(expect.stringContaining("json"));
 
             expect(response.body).toEqual({
                 message: "Missing userId in request",

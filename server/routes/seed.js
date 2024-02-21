@@ -83,13 +83,9 @@ router.post("/all", async (req, res) => {
 
         const responses = {};
 
-        for (const [endpointKey, { endpoint, method }] of Object.entries(
-            seedEndpoints
-        )) {
+        for (const [endpointKey, { endpoint, method }] of Object.entries(seedEndpoints)) {
             try {
-                const response = await method(
-                    `http://localhost:${localPort}/api${endpoint}`
-                );
+                const response = await method(`http://localhost:${localPort}/api${endpoint}`);
                 responses[endpointKey] = response.data;
             } catch (error) {
                 responses[endpointKey] = { error: error.message };
@@ -109,19 +105,12 @@ router.post("/testUser", async (req, res) => {
     try {
         const files = await getSeedFiles();
 
-        let [acceptedFiles, rejectedFiles] = validateFiles(
-            "profile_",
-            ".json",
-            files
-        );
+        let [acceptedFiles, rejectedFiles] = validateFiles("profile_", ".json", files);
         let failedImport = [];
 
         await Promise.all(
             acceptedFiles.map(async (file) => {
-                const fileContents = await fs.readFile(
-                    `${__dirname}/../seed_data/${file}`,
-                    "utf8"
-                );
+                const fileContents = await fs.readFile(`${__dirname}/../seed_data/${file}`, "utf8");
                 const jsonArray = JSON.parse(fileContents);
 
                 if (
@@ -140,7 +129,7 @@ router.post("/testUser", async (req, res) => {
                         message: "check data input",
                     });
                 }
-            })
+            }),
         );
 
         res.status(200).json({
@@ -167,10 +156,7 @@ router.post("/portfolio", async (req, res) => {
 
         await Promise.all(
             acceptedFiles.map(async (file) => {
-                const fileContents = await fs.readFile(
-                    `${__dirname}/../seed_data/${file}`,
-                    "utf8"
-                );
+                const fileContents = await fs.readFile(`${__dirname}/../seed_data/${file}`, "utf8");
                 const jsonArray = JSON.parse(fileContents);
 
                 await Promise.all(
@@ -180,34 +166,32 @@ router.post("/portfolio", async (req, res) => {
                         });
 
                         Object.keys(jsonArray[userEmail]).map(async (stock) => {
-                            jsonArray[userEmail][stock].map(
-                                async (transaction) => {
-                                    if (
-                                        transaction["action"] &&
-                                        transaction["date"] &&
-                                        transaction["price"] &&
-                                        transaction["amount"]
-                                    ) {
-                                        await portfolioModel.create({
-                                            userId: userProfile.id,
-                                            stockId: stock,
-                                            action: transaction["action"],
-                                            date: new Date(transaction["date"]),
-                                            price: transaction["price"],
-                                            amount: transaction["amount"],
-                                        });
-                                    } else {
-                                        failedImport.push({
-                                            data: transaction,
-                                            message: "check data input",
-                                        });
-                                    }
+                            jsonArray[userEmail][stock].map(async (transaction) => {
+                                if (
+                                    transaction["action"] &&
+                                    transaction["date"] &&
+                                    transaction["price"] &&
+                                    transaction["amount"]
+                                ) {
+                                    await portfolioModel.create({
+                                        userId: userProfile.id,
+                                        stockId: stock,
+                                        action: transaction["action"],
+                                        date: new Date(transaction["date"]),
+                                        price: transaction["price"],
+                                        amount: transaction["amount"],
+                                    });
+                                } else {
+                                    failedImport.push({
+                                        data: transaction,
+                                        message: "check data input",
+                                    });
                                 }
-                            );
+                            });
                         });
-                    })
+                    }),
                 );
-            })
+            }),
         );
 
         res.status(200).json({
@@ -227,17 +211,13 @@ router.post("/stocks", async (req, res) => {
 
     try {
         const files = await getSeedFiles();
-        let [acceptedFiles, rejectedFiles] = validateFiles(
-            "stocks_",
-            ".csv",
-            files
-        );
+        let [acceptedFiles, rejectedFiles] = validateFiles("stocks_", ".csv", files);
         let failedImport = [];
 
         await Promise.all(
             acceptedFiles.map(async (file) => {
                 const jsonArray = await csvtojson().fromFile(
-                    path.join(__dirname, "../seed_data/", file)
+                    path.join(__dirname, "../seed_data/", file),
                 );
 
                 const documents = jsonArray.map((stock) => {
@@ -256,7 +236,7 @@ router.post("/stocks", async (req, res) => {
                 });
 
                 await stocksModel.insertMany(documents.filter(Boolean));
-            })
+            }),
         );
 
         res.status(200).json({
@@ -277,27 +257,22 @@ router.post("/pricing", async (req, res) => {
     try {
         const files = await getSeedFiles();
 
-        let [acceptedFiles, rejectedFiles] = validateFiles(
-            "performance_",
-            ".csv",
-            files
-        );
+        let [acceptedFiles, rejectedFiles] = validateFiles("performance_", ".csv", files);
         let failedImport = [];
         let collectionsEdited = [];
 
         acceptedFiles.forEach(async (file) => {
-            const [, market, ticker] =
-                file.match(/performance_(\w+)_(\w+(-\w+)?)\.csv/) || [];
+            const [, market, ticker] = file.match(/performance_(\w+)_(\w+(-\w+)?)\.csv/) || [];
 
             const pricingModel = mongoose.model(
                 `performance-${market.toLowerCase()}`,
-                pricingSchema
+                pricingSchema,
             );
 
             collectionsEdited.push(pricingModel.collection.name);
 
             const jsonArray = await csvtojson().fromFile(
-                path.join(__dirname, "../seed_data/", file)
+                path.join(__dirname, "../seed_data/", file),
             );
 
             const documents = jsonArray.map((stockPerformance) => {

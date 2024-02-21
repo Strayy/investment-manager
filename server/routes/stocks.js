@@ -10,13 +10,10 @@ router.get("/recentPricing", async (req, res) => {
         const currentYear = new Date().getFullYear();
 
         const performanceModel = await mongoose.connection.collection(
-            `performance-${exchange.toLowerCase()}`
+            `performance-${exchange.toLowerCase()}`,
         );
 
-        const allData = await performanceModel
-            .find({ stock: ticker })
-            .sort({ date: -1 })
-            .toArray();
+        const allData = await performanceModel.find({ stock: ticker }).sort({ date: -1 }).toArray();
 
         let mostRecentPricing;
         let dailyChangePercent;
@@ -25,7 +22,7 @@ router.get("/recentPricing", async (req, res) => {
 
         async function updatePricing() {
             await axios.post(
-                `http://localhost:${process.env.PORT}/api/stock/updatePricing?stock=${req.query.stock}`
+                `http://localhost:${process.env.PORT}/api/stock/updatePricing?stock=${req.query.stock}`,
             );
 
             await calculateChangePercents();
@@ -40,8 +37,7 @@ router.get("/recentPricing", async (req, res) => {
             mostRecentPricing = allDataUpdated;
 
             dailyChangePercent =
-                ((mostRecentPricing[0].adjClose -
-                    mostRecentPricing[1].adjClose) /
+                ((mostRecentPricing[0].adjClose - mostRecentPricing[1].adjClose) /
                     mostRecentPricing[1].adjClose) *
                 100;
 
@@ -57,9 +53,7 @@ router.get("/recentPricing", async (req, res) => {
                 .sort({ date: 1 })
                 .toArray();
 
-            ytdChangePercent =
-                (mostRecentPricing[0].adjClose / calYearData[0].adjClose - 1) *
-                100;
+            ytdChangePercent = (mostRecentPricing[0].adjClose / calYearData[0].adjClose - 1) * 100;
         }
 
         if (Object.keys(allData).length === 0) {
@@ -84,9 +78,7 @@ router.get("/recentPricing", async (req, res) => {
             },
             dailyChange: {
                 percentage: dailyChangePercent,
-                actual:
-                    mostRecentPricing[0].adjClose -
-                    mostRecentPricing[1].adjClose,
+                actual: mostRecentPricing[0].adjClose - mostRecentPricing[1].adjClose,
             },
         });
     } catch (err) {
@@ -100,7 +92,7 @@ router.post("/updatePricing", async (req, res) => {
         const [exchange, ticker] = req.query.stock.split("_");
 
         const performanceModel = mongoose.connection.collection(
-            `performance-${exchange.toLowerCase()}`
+            `performance-${exchange.toLowerCase()}`,
         );
 
         const oldPricingData = await performanceModel
@@ -126,7 +118,7 @@ router.post("/updatePricing", async (req, res) => {
                 `https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?apikey=${
                     process.env.FMP_KEY
                 }&from=${latestDate.toISOString().split("T")[0]}`,
-                { timeout: 10000 }
+                { timeout: 10000 },
             );
 
             newPricingData = await response.json();

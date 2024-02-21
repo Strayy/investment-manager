@@ -46,7 +46,7 @@ router.get("/getMostRecentTransaction", async (req, res) => {
                         .sort({ date: -1 });
 
                     latestTransactions[stock] = data[0];
-                })
+                }),
             );
 
             res.status(200).json(latestTransactions);
@@ -106,8 +106,7 @@ router.get("/getHoldings", async (req, res) => {
                         amount += transaction["amount"];
 
                         avgPrice =
-                            (avgPrice * buyCount +
-                                transaction["price"] * transaction["amount"]) /
+                            (avgPrice * buyCount + transaction["price"] * transaction["amount"]) /
                             (buyCount + transaction["amount"]);
 
                         buyCount += transaction["amount"];
@@ -122,23 +121,20 @@ router.get("/getHoldings", async (req, res) => {
                 };
 
                 const recentPricing = await axios.get(
-                    `http://localhost:${process.env.PORT}/api/stock/recentPricing?stock=${stock}`
+                    `http://localhost:${process.env.PORT}/api/stock/recentPricing?stock=${stock}`,
                 );
 
                 latestPricing[stock] = recentPricing.data.latestPrice.adjClose;
 
-                totalPortfolioValue +=
-                    recentPricing.data.latestPrice.adjClose * amount;
-            })
+                totalPortfolioValue += recentPricing.data.latestPrice.adjClose * amount;
+            }),
         );
 
         await Promise.all(
             distinctValues.map((stock) => {
                 holdings[stock]["percentage"] =
-                    ((latestPricing[stock] * holdings[stock].amount) /
-                        totalPortfolioValue) *
-                    100;
-            })
+                    ((latestPricing[stock] * holdings[stock].amount) / totalPortfolioValue) * 100;
+            }),
         );
 
         res.status(200).json({

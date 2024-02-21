@@ -50,7 +50,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
             };
 
             // Applies simple conditional styling to <p> tag to be returned.
-            let dataReturn = (
+            const dataReturn = (
                 <p
                     className={`${
                         columnStyling?.[arrayIndex].includes("bold") ? "bold-data" : ""
@@ -89,7 +89,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
 
     // Generates table headings
     function returnHeadings() {
-        let thElements: JSX.Element[] = [];
+        const thElements: JSX.Element[] = [];
 
         data?.headings?.forEach((heading: string, index: number) => {
             thElements.push(<th key={`heading-${index}`}>{heading}</th>);
@@ -100,7 +100,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
 
     // Generates table sections and columns
     function returnSections() {
-        let sections: JSX.Element[][][] = [];
+        const sections: JSX.Element[][][] = [];
 
         if (data && data.sections) {
             // Loops through table data sections

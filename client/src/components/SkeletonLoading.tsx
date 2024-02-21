@@ -7,10 +7,10 @@ function SkeletonLoading({
     tableRows,
 }: SkeletonLoadingProps): JSX.Element {
     function generateTableRows(): JSX.Element {
-        let tableRowElements: JSX.Element[] = [];
+        const tableRowElements: JSX.Element[] = [];
 
         for (let i = 0; i < tableRows; i++) {
-            let tableCellElements: JSX.Element[] = [];
+            const tableCellElements: JSX.Element[] = [];
 
             for (let j = 0; j < tableColumns; j++) {
                 tableCellElements.push(

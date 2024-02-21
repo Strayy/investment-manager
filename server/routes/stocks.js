@@ -20,15 +20,15 @@ router.get("/recentPricing", async (req, res) => {
         let ytdChangePercent;
         let calYearData;
 
-        async function updatePricing() {
+        const updatePricing = async () => {
             await axios.post(
                 `http://localhost:${process.env.PORT}/api/stock/updatePricing?stock=${req.query.stock}`,
             );
 
             await calculateChangePercents();
-        }
+        };
 
-        async function calculateChangePercents() {
+        const calculateChangePercents = async () => {
             const allDataUpdated = await performanceModel
                 .find({ stock: ticker })
                 .sort({ date: -1 })
@@ -54,7 +54,7 @@ router.get("/recentPricing", async (req, res) => {
                 .toArray();
 
             ytdChangePercent = (mostRecentPricing[0].adjClose / calYearData[0].adjClose - 1) * 100;
-        }
+        };
 
         if (Object.keys(allData).length === 0) {
             await updatePricing();
@@ -146,8 +146,8 @@ router.post("/updatePricing", async (req, res) => {
                         };
                     } else {
                         failedImport.push({
+                            message: "Data returned is incomplete",
                             data: day,
-                            message: err.message,
                         });
                         return;
                     }

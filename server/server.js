@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-const csvToJson = require("csvtojson");
 
 const mongoConnectionString = `${process.env.MONGO_URI}investment-manager`;
 mongoose.connect(mongoConnectionString, {
@@ -12,11 +11,11 @@ mongoose.connect(mongoConnectionString, {
 const database = mongoose.connection;
 
 database.on("error", (error) => {
-    console.log(error);
+    console.error(error);
 });
 
 database.once("connected", () => {
-    console.log("Mongodb Database Successfully Connected");
+    console.warn("Mongodb Database Successfully Connected");
 });
 
 const app = express();
@@ -38,7 +37,7 @@ const routes = require("./routes/routes");
 app.use("/api", routes);
 
 const server = app.listen(port, () => {
-    console.log(`Server is running on port: ${port}`);
+    console.warn(`Server is running on port: ${port}`);
 });
 
 module.exports = { app, server };

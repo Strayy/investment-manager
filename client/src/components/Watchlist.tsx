@@ -60,7 +60,7 @@ function Watchlist() {
     // }, []);
 
     function returnWatchListItems() {
-        let watchListItems: JSX.Element[] = [];
+        const watchListItems: JSX.Element[] = [];
 
         investments.forEach((item) => {
             watchListItems.push(

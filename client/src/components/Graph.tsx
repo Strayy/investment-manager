@@ -60,8 +60,8 @@ function Graph() {
     }, []);
 
     useEffect(() => {
-        let dateList: string[] = [];
-        let datasetsList: {}[] = [];
+        const dateList: string[] = [];
+        const datasetsList: object[] = [];
 
         Promise.all(
             tickers.map(async (ticker) => {

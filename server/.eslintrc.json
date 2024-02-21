@@ -10,7 +10,9 @@
         "sourceType": "module"
     },
     "plugins": ["prettier"],
-    "rules": {},
+    "rules": {
+        "no-console": ["error", { "allow": ["error", "warn"] }]
+    },
     "overrides": [
         {
             "files": ["**/*.test.js"],

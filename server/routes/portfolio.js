@@ -68,8 +68,6 @@ router.get("/getMostRecentTransaction", async (req, res) => {
 // ADD TRADE TO TRANSACTIONS
 router.post("/addTrade", async (req, res) => {
     try {
-        console.log(req);
-
         res.status(200).json({ message: true });
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -99,9 +97,6 @@ router.get("/getHoldings", async (req, res) => {
                 });
 
                 singleStockData.map((transaction) => {
-                    if (transaction["action"] == "BUY") {
-                    }
-
                     if (transaction["action"] == "BUY") {
                         amount += transaction["amount"];
 

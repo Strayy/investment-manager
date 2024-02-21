@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import Graph from "../components/Graph";
 import Table from "../components/Table";
 
-import { ITableData } from "../types/tableData";
+import { ITableData, Section } from "../types/tableData";
 
 function Portfolio() {
-    const [portfolioData, updatePortfolioData] = useState<any>(null);
+    const [portfolioData, updatePortfolioData] = useState<{ [key: string]: Section } | undefined>(
+        undefined,
+    );
     const [tableData, updateTableData] = useState<ITableData | null>(null);
     const [isLoading, updateIsLoading] = useState<boolean>(true);
 
@@ -20,13 +22,13 @@ function Portfolio() {
             );
             const dataJson = await rawPortfolioData.json();
 
-            let portfolioData: any = {};
+            const portfolioData: { [key: string]: Section } = {};
 
             // Loops through each stock in portfolio
             for (const [stockKey, stockData] of Object.entries(dataJson.holdings) as [
                 string,
-                any,
-            ]) {
+                { amount: number; averageBuyPrice: number; percentage: number },
+            ][]) {
                 const [exchange, ticker] = stockKey.split("_");
 
                 // Returns current pricing of stock

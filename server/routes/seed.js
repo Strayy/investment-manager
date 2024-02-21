@@ -17,7 +17,8 @@ async function getSeedFiles() {
         const files = await fs.readdir(seedFolder);
         return files;
     } catch (err) {
-        throw err;
+        console.error(err.message);
+        throw new Error(err);
     }
 }
 

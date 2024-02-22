@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "scripts": {
         "start": "nodemon server.js",
-        "test": "jest --setupFiles dotenv/config --detectOpenHandles",
+        "test": "jest --setupFiles dotenv/config --detectOpenHandles --silent",
         "lint": "eslint \"**/*.js\"",
         "format": "prettier --write \"**/*.js\" --config ./.prettierrc"
     },

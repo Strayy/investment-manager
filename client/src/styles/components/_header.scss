@@ -9,10 +9,67 @@
     padding-bottom: 1em;
     height: 50.656px;
 
-    span {
+    > span {
         display: flex;
         flex-direction: row;
         gap: 0.5em;
+        width: 100%;
+
+        &:nth-child(1) {
+            justify-content: flex-start;
+        }
+
+        &:nth-child(2) {
+            display: flex;
+            gap: 0.5em;
+            height: 100%;
+            justify-content: flex-end;
+            align-items: center;
+
+            select {
+                appearance: none;
+                text-align: center;
+            }
+
+            .notifications {
+                margin: 0.5em;
+                height: 2em;
+                width: 2em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                cursor: pointer;
+
+                .notifications-circle {
+                    background-color: #ef3e36;
+                    height: 10px;
+                    width: 10px;
+                    border-radius: 100%;
+                    position: absolute;
+                    top: 1px;
+                    right: 3px;
+                    border: 2px solid #00111c;
+                }
+
+                i {
+                    display: flex;
+                    font-size: 1.5em;
+                }
+            }
+
+            .profile-picture {
+                height: 100%;
+                aspect-ratio: 1 / 1;
+                box-sizing: border-box;
+                margin: 2px 0;
+                background-position: center;
+                background-size: cover;
+                border-radius: 100%;
+                border: 2px solid #002945;
+                cursor: pointer;
+            }
+        }
 
         a {
             text-decoration: none;
@@ -31,12 +88,7 @@
         }
     
         input {
-            width: 20em;
-        }
-    
-        select {
-            appearance: none;
-            text-align: center;
+            min-width: calc((100% - 4em) / 3 * 2);
         }
     }
 }

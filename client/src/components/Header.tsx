@@ -4,9 +4,7 @@ function Header() {
     return (
         <div className='header-container'>
             <span>
-                <Link to='/'>
-                    <p>Investment Management Dashboard</p>
-                </Link>
+                <input type='text' placeholder='Search...' />
             </span>
             <span>
                 <select>
@@ -26,7 +24,24 @@ function Header() {
                     <option>NZD $</option>
                     <option>INR ₹</option>
                 </select>
-                <input type='text' placeholder='Search...' />
+                <div className='notifications'>
+                    {Math.random() < 0.5 ? (
+                        <>
+                            <div className='notifications-circle'></div>
+                            <i className='fi fi-ss-bell'></i>
+                        </>
+                    ) : (
+                        <>
+                            <i className='fi fi-rr-bell'></i>
+                        </>
+                    )}
+                </div>
+                <div
+                    className='profile-picture'
+                    style={{
+                        backgroundImage: `url("https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")`,
+                    }}
+                ></div>
             </span>
         </div>
     );

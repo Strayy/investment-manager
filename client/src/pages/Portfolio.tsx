@@ -5,14 +5,27 @@ import Table from "../components/Table";
 import Dialog from "../components/Dialog";
 import AddTransaction from "../components/AddTransaction";
 import { ITableData, Section } from "../types/tableData";
+import { useParams, useNavigate } from "react-router-dom";
 
 function Portfolio() {
+    const { param } = useParams();
+    const navigate = useNavigate();
+
     const [portfolioData, setPortfolioData] = useState<{ [key: string]: Section } | undefined>(
         undefined,
     );
     const [tableData, setTableData] = useState<ITableData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [showDialog, setShowDialog] = useState<boolean>(false);
+
+    // Check link to see if it has the buy param. I.e., /portfolio/buy. If true, open the add transaction dialog. If /portfolio only, do nothing. If /portfolio/anything_else, redirect to the dashboard.
+    useEffect(() => {
+        if (param === "buy") {
+            setShowDialog(true);
+        } else if (param !== undefined) {
+            navigate("/");
+        }
+    }, [param]);
 
     // Transaction mode state for add transaction dialog. True = buy, False = sell. Defaults to Buy for when clicking button from sidebar.
     const [transactionMode, setTransactionMode] = useState<boolean>(true);
@@ -109,12 +122,17 @@ function Portfolio() {
         });
     }, [portfolioData]);
 
+    function closeDialog() {
+        navigate("/portfolio");
+        setShowDialog(false);
+    }
+
     return (
         <div className='portfolio'>
             {showDialog && (
                 <Dialog
                     dialogContent={<AddTransaction transactionMode={transactionMode} />}
-                    closeAction={setShowDialog}
+                    closeAction={() => closeDialog()}
                 />
             )}
             <div className='portfolio-title'>

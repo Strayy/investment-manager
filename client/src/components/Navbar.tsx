@@ -18,7 +18,7 @@ function NavBar() {
             </div>
 
             <div className='tab-end'>
-                <Link to='/portfolio'>
+                <Link to='/portfolio/buy'>
                     <div>
                         <i className='fi fi-rr-plus-hexagon'></i>
                     </div>

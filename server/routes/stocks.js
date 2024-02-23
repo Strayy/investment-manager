@@ -57,7 +57,7 @@ router.post("/createStockProfile", async (req, res) => {
 
             brandfetchData["logos"].forEach((logo) => {
                 logos[`${logo["theme"]}_${logo["type"]}`] = logo["formats"].filter(
-                    (logo) => logo.format === "png",
+                    (logo) => logo.format !== "svg",
                 )[0]["src"];
             });
 

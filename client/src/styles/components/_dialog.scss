@@ -1,0 +1,42 @@
+.dialog {
+    .dialog-close {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        z-index: 1000;
+        left: 0;
+        top: 0;
+    }
+
+    .dialog-box {
+        position: absolute;
+        background-color: #00111c;
+        border: 2px solid #002945;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 5px;
+        padding: 1em;
+        z-index: 1001;
+
+        > i {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            padding: 0.5em;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #DADADA;
+            font-size: 0.75em;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:hover {
+                color: #FFFFFF;
+            }
+        }
+    }
+}

@@ -9,9 +9,7 @@ function Dashboard() {
                 <Watchlist />
             </div>
             <div className='lower-dashboard-container'>
-                <div>
-                    <Graph />
-                </div>
+                <div>{/* <Graph /> */}</div>
                 <div>{/* <Table /> */}</div>
             </div>
         </div>

@@ -2,15 +2,20 @@ import { useEffect, useState } from "react";
 
 import Graph from "../components/Graph";
 import Table from "../components/Table";
-
+import Dialog from "../components/Dialog";
+import AddTransaction from "../components/AddTransaction";
 import { ITableData, Section } from "../types/tableData";
 
 function Portfolio() {
-    const [portfolioData, updatePortfolioData] = useState<{ [key: string]: Section } | undefined>(
+    const [portfolioData, setPortfolioData] = useState<{ [key: string]: Section } | undefined>(
         undefined,
     );
-    const [tableData, updateTableData] = useState<ITableData | null>(null);
-    const [isLoading, updateIsLoading] = useState<boolean>(true);
+    const [tableData, setTableData] = useState<ITableData | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [showDialog, setShowDialog] = useState<boolean>(false);
+
+    // Transaction mode state for add transaction dialog. True = buy, False = sell. Defaults to Buy for when clicking button from sidebar.
+    const [transactionMode, setTransactionMode] = useState<boolean>(true);
 
     // Returns and formats data to be passed to Table component upon page load
     useEffect(() => {
@@ -49,21 +54,23 @@ function Portfolio() {
                 portfolioData[exchange] = {
                     data: [
                         [
-                            ticker,
+                            ticker === "RAT" ? "🐀" : ticker,
                             stockData["amount"],
-                            pricingDataJson["latestPrice"]["adjClose"],
+                            Math.round(pricingDataJson["latestPrice"]["adjClose"] * 100) / 100,
                             Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,
                             Math.round(pricingDataJson["ytd"]["percentage"] * 100) / 100,
                             stockData["averageBuyPrice"],
                             Math.round(stockData["percentage"] * 10) / 10,
-                            latestTransactionJson[stockKey].date.split("T")[0],
+                            new Date(latestTransactionJson[stockKey].date).toLocaleDateString(
+                                "en-GB",
+                            ),
                         ],
                     ],
                 };
             }
 
-            updatePortfolioData(portfolioData);
-            updateIsLoading(false);
+            setPortfolioData(portfolioData);
+            setIsLoading(false);
         }
 
         getPortfolioData();
@@ -71,7 +78,7 @@ function Portfolio() {
 
     // Updates tableData state when portfolioData is changed.
     useEffect(() => {
-        updateTableData({
+        setTableData({
             headings: [
                 "Item",
                 "Quantity",
@@ -104,20 +111,38 @@ function Portfolio() {
 
     return (
         <div className='portfolio'>
+            {showDialog && (
+                <Dialog
+                    dialogContent={<AddTransaction transactionMode={transactionMode} />}
+                    closeAction={setShowDialog}
+                />
+            )}
             <div className='portfolio-title'>
                 <h1>Portfolio</h1>
                 <div>
-                    <div>Buy</div>
-                    <div>Sell</div>
+                    <div
+                        onClick={() => {
+                            setShowDialog(true);
+                            setTransactionMode(true);
+                        }}
+                    >
+                        Buy
+                    </div>
+                    <div
+                        onClick={() => {
+                            setShowDialog(true);
+                            setTransactionMode(false);
+                        }}
+                    >
+                        Sell
+                    </div>
                 </div>
             </div>
             <div className='portfolio-elements'>
                 <div className='table'>
                     <Table data={tableData} isLoading={isLoading} />
                 </div>
-                <div className='graph'>
-                    <Graph />
-                </div>
+                <div className='graph'>{/* <Graph /> */}</div>
             </div>
         </div>
     );

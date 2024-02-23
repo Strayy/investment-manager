@@ -1,0 +1,140 @@
+.add-transaction-dialog-content {
+    display: flex;
+    gap: 1.5em;
+    flex-direction: column;
+
+    h1 {
+        font-size: 1.25em;
+        font-weight: 500;
+        line-height: 0.825;
+    }
+
+    > input {
+        padding: 1em;
+    }
+
+    input {
+        border-radius: 0.5em;
+        border: 2px solid #002945;
+        background: none;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .input-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        > div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2em;
+
+            &:nth-child(1) {
+                input {
+                    border-radius: 0 0.5em 0.5em 0 !important;
+                    padding-left: 0.5em;
+                }
+            }
+
+            div {
+                display: flex;
+                align-items: stretch;
+                flex-direction: row;
+                width: 10em;
+
+                .market-price-symbol {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    padding: 0 0.75em;
+                    border-radius: 0.5em 0 0 0.5em;
+                    border: 2px solid #002945;
+                    border-right: none;
+                    font-size: 0.9em;
+                }
+            }
+
+            input {
+                padding: 0.5em 1em;
+                flex-grow: 2;
+            }
+
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+            }
+        }
+    }
+
+    .total {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        border: 2px solid #002945;
+        border-radius: 5px;
+        padding: 0.75em;
+
+        span {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+
+            i {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            p {
+                &.buy-style {
+                    color: #38a700;
+                }
+
+                &.sell-style {
+                    color: #ef3e36;
+                }
+            }
+        }
+    }
+
+    .add-trade-button {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &.buy-style {
+                border-color: #38a700;
+                background-color: rgba(56, 167, 0, 0.5);
+
+                &:hover {
+                    background-color: rgba(56, 167, 0, 0.75);
+                }
+            }
+
+            &.sell-style {
+                border-color: #ef3e36;
+                background-color: rgba(239, 62, 54, 0.5);
+
+                &:hover {
+                    background-color: rgba(239, 62, 54, 0.75);
+                }
+            }
+
+            &:active {
+                outline: none;
+            }
+        }
+    }
+}

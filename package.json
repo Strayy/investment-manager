@@ -7,6 +7,7 @@
         "test": "concurrently \"cd server && npm test\"",
         "lint": "concurrently \"cd client && npm run lint\" \"cd server && npm run lint\"",
         "prettify": "concurrently \"cd client && npm run format\" \"cd server && npm run format\"",
+        "install-all": "concurrently \"cd client && sudo rm -rf node_modules package-lock.json && npm i\" \"cd server && sudo rm -rf node_modules package-lock.json && npm i\"",
         "prepare": "husky"
     },
     "husky": {

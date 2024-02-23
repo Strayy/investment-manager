@@ -3,16 +3,178 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const axios = require("axios");
 
+const exchangeSettings = require("../data/exchangeSettings");
+const getYahooCrumb = require("../scripts/getYahooCredentials");
+
+const stocksModel = require("../models/stocksModel");
+
+let cookies, crumb;
+
+// Get Yahoo Finance cookie and crumb when loading server
+(async () => {
+    try {
+        [cookies, crumb] = await getYahooCrumb();
+
+        if (cookies !== undefined && crumb !== undefined) {
+            console.warn("Yahoo Credentials Loaded Successfully");
+        } else {
+            throw new Error();
+        }
+    } catch (err) {
+        console.error("Error getching Yahoo credentials");
+    }
+})();
+
+// CREATE STOCK PROFILE
+router.post("/createStockProfile", async (req, res) => {
+    try {
+        const [exchange, ticker] = req.query.stock.split("_");
+
+        // If cookies and crumb do not exist before running endpoint, throw error.
+        if (cookies === undefined || crumb === undefined) {
+            throw new Error(
+                "Failed to get Yahoo cookie and crumb before /createStockProfile request. Please try again or restart server.",
+            );
+        }
+
+        // Convert URL in the form https://www.tesla.com to tesla.com
+        const extractDomain = (url) => {
+            const urlMatch = url.match(/:\/\/(www\.)?(.+?)(\/|$)/);
+
+            if (urlMatch) {
+                const domain = urlMatch[2];
+                const cleanedDomain = domain.replace(/^[^:]+:/, "");
+
+                return cleanedDomain;
+            }
+
+            return url;
+        };
+
+        // Format logos returned from Brandfetch API to be stored in database
+        const formatLogos = (brandfetchData) => {
+            const logos = {};
+
+            brandfetchData["logos"].forEach((logo) => {
+                logos[`${logo["theme"]}_${logo["type"]}`] = logo["formats"].filter(
+                    (logo) => logo.format === "png",
+                )[0]["src"];
+            });
+
+            return logos;
+        };
+
+        // Format colours returned from Brandfetch API to be stored in database
+        const formatColors = (brandfetchData) => {
+            const colors = {};
+
+            brandfetchData["colors"].forEach((color) => {
+                colors[color.type] = color.hex;
+            });
+
+            return colors;
+        };
+
+        // Checks to see if requested exchange is in list of supported exchanges
+        if (Object.keys(exchangeSettings).includes(exchange)) {
+            // Query Yahoo API to retrieve company information based on ticker.
+            const yahooResponse = await fetch(
+                `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${ticker}${exchangeSettings[exchange] !== undefined ? exchangeSettings[exchange]["yahooFinanceSuffix"] : ""}?formatted=true&crumb=${crumb}&modules=assetProfile`,
+                {
+                    timeout: 10000,
+                    method: "GET",
+                    headers: {
+                        Cookie: cookies
+                            .map((cookie) => `${cookie.name}=${cookie.value}`)
+                            .join("; "),
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            // Throw an error if Yahoo finance API fails
+            if (yahooResponse.status !== 200) {
+                throw new Error(`Error from Yahoo Finance API: ${yahooResponse.message}`);
+            }
+
+            const yahooCompanyData = await yahooResponse.json();
+
+            const yahooData = yahooCompanyData["quoteSummary"]["result"][0]["assetProfile"];
+
+            // Throws an error if an error is returned from the request
+            if (yahooCompanyData["quoteSummary"]["error"] !== null) {
+                throw new Error(
+                    `Error from Yahoo Finance: ${yahooCompanyData["quoteSummary"]["error"]}`,
+                );
+            }
+
+            // Query Brandfetch API to retrieve company information based on company website.
+            const brandfetchResponse = await fetch(
+                `https://api.brandfetch.io/v2/brands/${extractDomain(yahooData["website"])}`,
+                {
+                    method: "GET",
+                    headers: {
+                        accept: "application/json",
+                        Authorization: `Bearer ${process.env.BRANDFETCH_KEY}`,
+                    },
+                },
+            );
+
+            // Throw an error if Brandfetch API fails
+            if (brandfetchResponse.status !== 200) {
+                throw new Error(`Error from Brandfetch API: ${brandfetchData.message}`);
+            }
+
+            const brandfetchData = await brandfetchResponse.json();
+
+            // Upserts the database with information from Brandfetch and Yahoo Finance
+            const databaseResponse = await stocksModel.findOneAndUpdate(
+                { id: req.query.stock },
+                {
+                    $set: {
+                        name: brandfetchData["name"],
+                        exchange: exchange,
+                        website: yahooData["website"],
+                        city: yahooData["city"],
+                        country: yahooData["country"],
+                        industry: yahooData["industryDisp"],
+                        sector: yahooData["sectorDisp"],
+                        shortDescription: brandfetchData["description"],
+                        description: brandfetchData["longDescription"],
+                        socialMedia: brandfetchData["links"],
+                        logos: formatLogos(brandfetchData),
+                        colors: formatColors(brandfetchData),
+                    },
+                },
+                { upsert: true, new: true, runValidators: true },
+            );
+
+            res.status(200).json({
+                message: `Updated stock profile for ${req.query.stock}.`,
+                data: databaseResponse,
+            });
+        } else {
+            throw new Error(
+                `Exchange is not supported. Supported exchanges: ${Object.keys(exchangeSettings)}`,
+            );
+        }
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // RETURN RECENT PRICING INFORMATION FOR A GIVEN TICKER
 router.get("/recentPricing", async (req, res) => {
     try {
         const [exchange, ticker] = req.query.stock.split("_");
         const currentYear = new Date().getFullYear();
 
+        // Find the MongoDB model associated with the exchange
         const performanceModel = await mongoose.connection.collection(
             `performance-${exchange.toLowerCase()}`,
         );
 
+        // Find all existing pricing data stored for a given ticker
         const allData = await performanceModel.find({ stock: ticker }).sort({ date: -1 }).toArray();
 
         let mostRecentPricing;
@@ -20,6 +182,7 @@ router.get("/recentPricing", async (req, res) => {
         let ytdChangePercent;
         let calYearData;
 
+        // Force update pricing if needed
         const updatePricing = async () => {
             await axios.post(
                 `http://localhost:${process.env.PORT}/api/stock/updatePricing?stock=${req.query.stock}`,
@@ -28,6 +191,7 @@ router.get("/recentPricing", async (req, res) => {
             await calculateChangePercents();
         };
 
+        // Calculate the daily and YTD percentage changes and assign calendar year data
         const calculateChangePercents = async () => {
             const allDataUpdated = await performanceModel
                 .find({ stock: ticker })
@@ -41,6 +205,7 @@ router.get("/recentPricing", async (req, res) => {
                     mostRecentPricing[1].adjClose) *
                 100;
 
+            // Find all data from current year and sort in ascending order by date
             calYearData = await mongoose.connection
                 .collection(`performance-${exchange.toLowerCase()}`)
                 .find({
@@ -56,12 +221,14 @@ router.get("/recentPricing", async (req, res) => {
             ytdChangePercent = (mostRecentPricing[0].adjClose / calYearData[0].adjClose - 1) * 100;
         };
 
+        // Force update pricing data if no existing pricing data found in database
         if (Object.keys(allData).length === 0) {
             await updatePricing();
         } else {
             const latestDate = new Date();
             latestDate.setDate(latestDate.getDate() - 5);
 
+            // Force update pricing data if data is more than 5 days old
             if (new Date(allData[0].date) < latestDate) {
                 await updatePricing();
             } else {
@@ -90,22 +257,6 @@ router.get("/recentPricing", async (req, res) => {
 router.post("/updatePricing", async (req, res) => {
     try {
         const [exchange, ticker] = req.query.stock.split("_");
-
-        // Supported exchanges
-        const exchangeSettings = {
-            NASDAQ: {
-                suffix: "",
-                exchangeCode: "NMS",
-            },
-            NYSE: {
-                suffix: "",
-                exchangeCode: "NYQ",
-            },
-            ASX: {
-                suffix: ".AX",
-                exchangeCode: "ASX",
-            },
-        };
 
         // Find the MongoDB model associated with the exchange
         const performanceModel = mongoose.connection.collection(
@@ -178,7 +329,7 @@ router.post("/updatePricing", async (req, res) => {
         // Checks to see if requested exchange is in list of supported exchanges
         if (Object.keys(exchangeSettings).includes(exchange)) {
             const response = await fetch(
-                `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}${exchangeSettings[exchange] !== undefined ? exchangeSettings[exchange]["suffix"] : ""}?interval=1d&range=${await rangeToUse()}`,
+                `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}${exchangeSettings[exchange] !== undefined ? exchangeSettings[exchange]["yahooFinanceSuffix"] : ""}?interval=1d&range=${await rangeToUse()}`,
                 { timeout: 10000 },
             );
 

@@ -21,13 +21,46 @@ const stocksSchema = new mongoose.Schema({
         required: false,
         type: String,
     },
-    logo: {
+    city: {
         required: false,
         type: String,
     },
-    color: {
+    country: {
         required: false,
         type: String,
+    },
+    industry: {
+        required: false,
+        type: String,
+    },
+    sector: {
+        required: false,
+        type: String,
+    },
+    shortDescription: {
+        required: false,
+        type: String,
+    },
+    description: {
+        required: false,
+        type: String,
+    },
+    socialMedia: {
+        required: false,
+        type: [
+            {
+                name: String,
+                url: String,
+            },
+        ],
+    },
+    logos: {
+        required: false,
+        type: mongoose.Schema.Types.Mixed,
+    },
+    colors: {
+        required: false,
+        type: mongoose.Schema.Types.Mixed,
     },
 });
 

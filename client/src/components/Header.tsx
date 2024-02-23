@@ -11,6 +11,20 @@ function Header() {
             <span>
                 <select>
                     <option>USD $</option>
+                    <option>EUR €</option>
+                    <option>JPY ¥</option>
+                    <option>GBP £</option>
+                    <option>CNY ¥</option>
+                    <option>AUD $</option>
+                    <option>CAD $</option>
+                    <option>CHF Fr.</option>
+                    <option>HKD $</option>
+                    <option>SGD $</option>
+                    <option>SEK kr</option>
+                    <option>KRW ₩</option>
+                    <option>NOK kr</option>
+                    <option>NZD $</option>
+                    <option>INR ₹</option>
                 </select>
                 <input type='text' placeholder='Search...' />
             </span>

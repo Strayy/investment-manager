@@ -163,6 +163,32 @@ router.post("/createStockProfile", async (req, res) => {
     }
 });
 
+// UPDATE STOCK PROFILE
+router.post("/updateStockProfile", async (req, res) => {
+    try {
+        if (!req.body.stock) {
+            throw new Error("No stock specified in request body");
+        }
+
+        if (!req.body.data) {
+            throw new Error("No data specified in request body.");
+        }
+
+        const result = await stocksModel.findOneAndUpdate(
+            { id: req.body.stock },
+            { $set: req.body.data },
+            { upsert: true, new: true, runValidators: true },
+        );
+
+        res.status(200).json({
+            message: `Updated ${Object.keys(req.body.data)} of ${req.body.stock}`,
+            result: result,
+        });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // RETURN RECENT PRICING INFORMATION FOR A GIVEN TICKER
 router.get("/recentPricing", async (req, res) => {
     try {
@@ -326,6 +352,32 @@ router.post("/updatePricing", async (req, res) => {
             }
         };
 
+        // Checks to ensure data being added is in the correct currency.
+        const validateCurrency = async (currency) => {
+            const data = await stocksModel.findOne({ id: req.query.stock });
+            const savedCurrency = data["currency"];
+
+            if (savedCurrency !== undefined && savedCurrency !== currency) {
+                throw new Error(
+                    `Currency received from request does not match that stored in ${req.query.stock}'s stock profile. Request gave ${currency}, but ${req.query.stock} is recorded as being in ${savedCurrency}`,
+                );
+            }
+
+            if (savedCurrency === undefined) {
+                await axios.post(
+                    `http://localhost:${process.env.PORT}/api/stock/updateStockProfile`,
+                    {
+                        stock: req.query.stock,
+                        data: {
+                            currency: currency,
+                        },
+                    },
+                );
+            }
+
+            return true;
+        };
+
         // Checks to see if requested exchange is in list of supported exchanges
         if (Object.keys(exchangeSettings).includes(exchange)) {
             const response = await fetch(
@@ -343,7 +395,11 @@ router.post("/updatePricing", async (req, res) => {
             }
 
             // Checks that data counts and exchanges match
-            if (ensureDataCount(newPricingData) && ensureExchangeMatch(newPricingData)) {
+            if (
+                ensureDataCount(newPricingData) &&
+                ensureExchangeMatch(newPricingData) &&
+                (await validateCurrency(newPricingData["chart"]["result"][0]["meta"]["currency"]))
+            ) {
                 const pricingData = newPricingData["chart"]["result"][0];
 
                 // Loop through each timestamp in the timestamp array to create an array of objects in the required format for the MongoDB model.

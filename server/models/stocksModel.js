@@ -17,6 +17,10 @@ const stocksSchema = new mongoose.Schema({
         required: true,
         type: String,
     },
+    currency: {
+        required: false,
+        type: String,
+    },
     website: {
         required: false,
         type: String,

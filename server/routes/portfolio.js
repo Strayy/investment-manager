@@ -7,6 +7,10 @@ router.use(bodyParser.json());
 
 const portfolioModel = require("../models/portfolioModel");
 
+const exchangeSettings = require("../data/exchangeSettings");
+const stocksModel = require("../models/stocksModel");
+const userModel = require("../models/userModel");
+
 // RETURN LIST OF TRADES
 router.get("/getTrades", async (req, res) => {
     try {
@@ -64,11 +68,63 @@ router.get("/getMostRecentTransaction", async (req, res) => {
     }
 });
 
-// TODO - Add endpoint for adding transaction/trade
 // ADD TRADE TO TRANSACTIONS
 router.post("/addTrade", async (req, res) => {
     try {
-        res.status(200).json({ message: true });
+        const [exchange, ticker] = req.body.stockId.split("_");
+
+        if (
+            !req.body.userId ||
+            !req.body.stockId ||
+            !req.body.action ||
+            !req.body.date ||
+            !req.body.price ||
+            !req.body.amount
+        ) {
+            throw new Error("Request body is missing data");
+        }
+
+        if (!["BUY", "SELL"].includes(req.body.action)) {
+            throw new Error(
+                `Action '${req.body.action}' is not a supported action. Currently supported actions are 'BUY' and 'SELL`,
+            );
+        }
+
+        if (!Object.keys(exchangeSettings).includes(exchange)) {
+            throw new Error(
+                `Stocks on ${exchange} are currently not supported. Supported exchanges: ${Object.keys(exchangeSettings)}`,
+            );
+        }
+
+        const supportedStocks = await stocksModel.distinct("ticker", {
+            exchange: exchange,
+        });
+
+        if (!supportedStocks.includes(ticker)) {
+            throw new Error(
+                `${req.body.stockId} is not a currently supported stock on the ${exchange}`,
+            );
+        }
+
+        const userProfile = await userModel.findOne({ id: req.body.userId });
+
+        if (userProfile === null) {
+            throw new Error(`User with id: '${req.body.userId}' not found.`);
+        }
+
+        const newTransaction = await portfolioModel.create({
+            userId: req.body.userId,
+            stockId: req.body.stockId,
+            action: req.body.action,
+            date: new Date(req.body.date),
+            price: req.body.price,
+            amount: req.body.amount,
+        });
+
+        res.status(200).json({
+            message: `${req.body.stockId} transaction added successfully.`,
+            data: newTransaction,
+        });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

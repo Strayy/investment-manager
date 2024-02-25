@@ -2,15 +2,67 @@ import { useState } from "react";
 
 import "../styles/components/_addTransaction.scss";
 
-function AddTransaction({ transactionMode }: { transactionMode: boolean }) {
-    const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0]);
+function AddTransaction({
+    transactionMode,
+    successAction,
+}: {
+    transactionMode: boolean;
+    successAction: () => void;
+}) {
+    const [stockId, setStockId] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
     const [marketPrice, setMarketPrice] = useState<string>("");
+    const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0]);
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<boolean>(false);
+
+    async function addTransaction() {
+        try {
+            setIsLoading(true);
+
+            const request = await fetch(
+                `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/addTrade`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        userId: "TEST-USER-ID",
+                        stockId: stockId,
+                        action: transactionMode ? "BUY" : "SELL",
+                        date: date,
+                        price: marketPrice,
+                        amount: amount,
+                    }),
+                },
+            );
+
+            if (request.status !== 200) {
+                throw new Error();
+            } else {
+                setError(false);
+            }
+
+            setTimeout(() => {
+                setIsLoading(false);
+                successAction();
+            }, 3000);
+        } catch (err) {
+            setError(true);
+        }
+    }
 
     return (
         <div className='add-transaction-dialog-content'>
             <h1>Add Transaction</h1>
-            <input type='text' placeholder='Search Investment...' />
+            <input
+                type='text'
+                placeholder='Search Investment...'
+                value={stockId}
+                onChange={(e) => setStockId(e.target.value)}
+            />
             <div className='input-fields'>
                 <div>
                     <p>Market Price</p>
@@ -51,10 +103,24 @@ function AddTransaction({ transactionMode }: { transactionMode: boolean }) {
                 </span>
             </div>
             <div className='add-trade-button'>
-                <button className={transactionMode ? "buy-style" : "sell-style"}>
-                    {transactionMode ? "Create Buy Transaction" : "Create Sell Transaction"}
-                </button>
+                {!isLoading ? (
+                    <button
+                        className={transactionMode ? "buy-style" : "sell-style"}
+                        onClick={addTransaction}
+                    >
+                        {transactionMode ? "Create Buy Transaction" : "Create Sell Transaction"}
+                    </button>
+                ) : (
+                    <div className={transactionMode ? "spinner buy-style" : "spinner sell-style"}>
+                        <i className='fi fi-br-spinner'></i>
+                    </div>
+                )}
             </div>
+            {error && (
+                <div className='add-trade-error'>
+                    There was an error adding trade. Please try again.
+                </div>
+            )}
         </div>
     );
 }

@@ -63,23 +63,20 @@ function Portfolio() {
 
                 const latestTransactionJson = await latestTransactionData.json();
 
+                // Create portfolioData section for the exchange if it doesn't exist, and populate with empty data array.
+                portfolioData[exchange] ??= { data: [] };
+
                 // Formats data to be added to portfolioData
-                portfolioData[exchange] = {
-                    data: [
-                        [
-                            ticker === "RAT" ? "🐀" : ticker,
-                            stockData["amount"],
-                            Math.round(pricingDataJson["latestPrice"]["adjClose"] * 100) / 100,
-                            Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,
-                            Math.round(pricingDataJson["ytd"]["percentage"] * 100) / 100,
-                            stockData["averageBuyPrice"],
-                            Math.round(stockData["percentage"] * 10) / 10,
-                            new Date(latestTransactionJson[stockKey].date).toLocaleDateString(
-                                "en-GB",
-                            ),
-                        ],
-                    ],
-                };
+                portfolioData[exchange]["data"].push([
+                    ticker === "RAT" ? "🐀" : ticker,
+                    stockData["amount"],
+                    Math.round(pricingDataJson["latestPrice"]["adjClose"] * 100) / 100,
+                    Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,
+                    Math.round(pricingDataJson["ytd"]["percentage"] * 100) / 100,
+                    stockData["averageBuyPrice"],
+                    Math.round(stockData["percentage"] * 10) / 10,
+                    new Date(latestTransactionJson[stockKey].date).toLocaleDateString("en-GB"),
+                ]);
             }
 
             setPortfolioData(portfolioData);
@@ -131,7 +128,12 @@ function Portfolio() {
         <div className='portfolio'>
             {showDialog && (
                 <Dialog
-                    dialogContent={<AddTransaction transactionMode={transactionMode} />}
+                    dialogContent={
+                        <AddTransaction
+                            transactionMode={transactionMode}
+                            successAction={() => closeDialog()}
+                        />
+                    }
                     closeAction={() => closeDialog()}
                 />
             )}

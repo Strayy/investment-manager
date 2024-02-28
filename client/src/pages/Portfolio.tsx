@@ -17,6 +17,7 @@ function Portfolio() {
     const [tableData, setTableData] = useState<ITableData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [showDialog, setShowDialog] = useState<boolean>(false);
+    const [totalPortfolioValue, setTotalPortfolioValue] = useState<number | null>(null);
 
     // Check link to see if it has the buy param. I.e., /portfolio/buy. If true, open the add transaction dialog. If /portfolio only, do nothing. If /portfolio/anything_else, redirect to the dashboard.
     useEffect(() => {
@@ -41,6 +42,8 @@ function Portfolio() {
             const dataJson = await rawPortfolioData.json();
 
             const portfolioData: { [key: string]: Section } = {};
+
+            setTotalPortfolioValue(dataJson.portfolio.totalValue);
 
             // Loops through each stock in portfolio
             for (const [stockKey, stockData] of Object.entries(dataJson.holdings) as [
@@ -132,6 +135,7 @@ function Portfolio() {
                         <AddTransaction
                             transactionMode={transactionMode}
                             successAction={() => closeDialog()}
+                            totalPortfolioValue={totalPortfolioValue}
                         />
                     }
                     closeAction={() => closeDialog()}

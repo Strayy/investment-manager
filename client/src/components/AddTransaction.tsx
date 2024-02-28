@@ -5,9 +5,11 @@ import "../styles/components/_addTransaction.scss";
 function AddTransaction({
     transactionMode,
     successAction,
+    totalPortfolioValue,
 }: {
     transactionMode: boolean;
     successAction: () => void;
+    totalPortfolioValue?: number | null;
 }) {
     const [stockId, setStockId] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
@@ -94,14 +96,36 @@ function AddTransaction({
                     </div>
                 </div>
             </div>
-            <div className='total'>
-                <p>Portfolio Summary:</p>
-                <span>
-                    <p>$50,000</p>
-                    <i className='fi fi-rr-arrow-right'></i>
-                    <p className={transactionMode ? "buy-style" : "sell-style"}>$10,000</p>
-                </span>
-            </div>
+
+            {totalPortfolioValue !== null && totalPortfolioValue !== undefined && (
+                <div className='total'>
+                    <p>Portfolio Summary:</p>
+                    <span>
+                        <p>
+                            {new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }).format(totalPortfolioValue)}
+                        </p>
+                        <i className='fi fi-rr-arrow-right'></i>
+                        <p className={transactionMode ? "buy-style" : "sell-style"}>
+                            {new Intl.NumberFormat("en-US", {
+                                style: "currency",
+                                currency: "USD",
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            }).format(
+                                transactionMode
+                                    ? totalPortfolioValue + Number(marketPrice) * Number(amount)
+                                    : totalPortfolioValue - Number(marketPrice) * Number(amount),
+                            )}
+                        </p>
+                    </span>
+                </div>
+            )}
+
             <div className='add-trade-button'>
                 {!isLoading ? (
                     <button

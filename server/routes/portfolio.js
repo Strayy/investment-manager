@@ -130,7 +130,6 @@ router.post("/addTrade", async (req, res) => {
     }
 });
 
-// TODO - Add percentage of portfolio to data returned
 // GET CURRENT HOLDINGS
 router.get("/getHoldings", async (req, res) => {
     try {

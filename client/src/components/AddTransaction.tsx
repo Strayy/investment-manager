@@ -153,6 +153,19 @@ function AddTransaction({
         }
     }
 
+    function sanitizeInput(
+        input: string,
+        stateReference: React.Dispatch<React.SetStateAction<string>>,
+    ) {
+        const sanitizedValue = input.replace(/[^0-9.]/g, "");
+
+        const decimalCount = sanitizedValue.split(".").length - 1;
+
+        if (decimalCount <= 1) {
+            stateReference(sanitizedValue);
+        }
+    }
+
     return (
         <div className='add-transaction-dialog-content'>
             <h1>Add Transaction</h1>
@@ -176,7 +189,7 @@ function AddTransaction({
                             type='text'
                             placeholder='0.00'
                             value={marketPrice}
-                            onChange={(e) => setMarketPrice(e.target.value.replace(/[^0-9.]/g, ""))}
+                            onChange={(e) => sanitizeInput(e.target.value, setMarketPrice)}
                         />
                     </div>
                 </div>
@@ -187,7 +200,7 @@ function AddTransaction({
                             type='text'
                             placeholder='1'
                             value={amount}
-                            onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+                            onChange={(e) => sanitizeInput(e.target.value, setAmount)}
                         />
                     </div>
                 </div>

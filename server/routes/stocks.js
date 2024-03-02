@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const axios = require("axios");
+const fuse = require("fuse.js");
 
 const exchangeSettings = require("../data/exchangeSettings");
 const getYahooCrumb = require("../scripts/getYahooCredentials");
@@ -184,6 +185,26 @@ router.post("/updateStockProfile", async (req, res) => {
             message: `Updated ${Object.keys(req.body.data)} of ${req.body.stock}`,
             result: result,
         });
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// SEARCH STOCK PROFILES
+router.post("/searchProfile", async (req, res) => {
+    try {
+        const allStocks = await stocksModel.find({});
+
+        const fuzzySearchOptions = {
+            keys: ["ticker", "name"],
+            threshold: 0.5,
+        };
+
+        const fuzzySearch = new fuse(allStocks, fuzzySearchOptions);
+
+        const fuzzySearchResult = fuzzySearch.search(req.body.searchTerm).slice(0, 5);
+
+        res.status(200).json(fuzzySearchResult);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

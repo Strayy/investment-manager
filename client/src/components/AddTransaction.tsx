@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "../styles/components/_addTransaction.scss";
+import { FuzzySearchResponse } from "../types/fuzzySearchResponseData";
 
 function AddTransaction({
     transactionMode,
@@ -11,40 +12,99 @@ function AddTransaction({
     successAction: () => void;
     totalPortfolioValue?: number | null;
 }) {
-    const [stockId, setStockId] = useState<string>("");
+    const [stockSearch, setStockSearch] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
     const [marketPrice, setMarketPrice] = useState<string>("");
     const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0]);
 
+    const [searchActive, setSearchActive] = useState<boolean>(false);
+    const [fuzzySearchData, setFuzzySearchData] = useState<FuzzySearchResponse[] | undefined>();
+    const [selectedStockData, setSelectedStockData] = useState<null | string>(null);
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
+
+    const abortControllerRef = useRef<null | AbortController>(null);
+
+    useEffect(() => {
+        setSearchActive(false);
+    }, [selectedStockData]);
+
+    useEffect(() => {
+        setSelectedStockData(null);
+
+        const searchRequest = async () => {
+            try {
+                const newAbortController = new AbortController();
+
+                abortControllerRef.current = newAbortController;
+
+                const response = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/searchProfile`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        signal: newAbortController.signal,
+                        body: JSON.stringify({ searchTerm: stockSearch }),
+                    },
+                );
+
+                if (newAbortController.signal.aborted) {
+                    return;
+                }
+
+                setFuzzySearchData(await response.json());
+                setSearchActive(true);
+            } catch (error) {
+                return;
+            }
+        };
+
+        if (stockSearch.trim() !== "") {
+            searchRequest();
+        } else {
+            setSearchActive(false);
+        }
+
+        return () => {
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
+        };
+    }, [stockSearch]);
 
     async function addTransaction() {
         try {
             setIsLoading(true);
 
-            const request = await fetch(
-                `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/addTrade`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        userId: "TEST-USER-ID",
-                        stockId: stockId,
-                        action: transactionMode ? "BUY" : "SELL",
-                        date: date,
-                        price: marketPrice,
-                        amount: amount,
-                    }),
-                },
-            );
+            if (date && marketPrice && amount && selectedStockData) {
+                const [exchange, ticker] = selectedStockData.split(":");
 
-            if (request.status !== 200) {
-                throw new Error();
-            } else {
-                setError(false);
+                const request = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}portfolio/addTrade`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            userId: "TEST-USER-ID",
+                            stockId: `${exchange.trim()}_${ticker.trim()}`,
+                            action: transactionMode ? "BUY" : "SELL",
+                            date: date,
+                            price: marketPrice,
+                            amount: amount,
+                        }),
+                    },
+                );
+
+                if (request.status !== 200) {
+                    throw new Error();
+                } else {
+                    setError(false);
+                }
             }
 
             setTimeout(() => {
@@ -53,18 +113,60 @@ function AddTransaction({
             }, 3000);
         } catch (err) {
             setError(true);
+            setIsLoading(false);
+        }
+    }
+
+    function returnFuzzySearchData() {
+        if (fuzzySearchData) {
+            const searchElements: JSX.Element[] = [];
+
+            fuzzySearchData.forEach((stock: FuzzySearchResponse) => {
+                searchElements.push(
+                    <div
+                        key={stock.item.id}
+                        onClick={() => {
+                            setSelectedStockData(`${stock.item.exchange}: ${stock.item.ticker}`);
+                        }}
+                    >
+                        <img
+                            src={
+                                stock.item.logos && stock.item.logos.light_symbol
+                                    ? stock.item.logos.light_symbol
+                                    : "https://icons.veryicon.com/png/o/business/oa-attendance-icon/company-27.png"
+                            }
+                            alt={`${stock.item.name} Logo`}
+                        />
+                        <div>
+                            <p>{stock.item.name}</p>
+                            <p>
+                                {stock.item.exchange}: {stock.item.ticker}
+                            </p>
+                        </div>
+                    </div>,
+                );
+            });
+
+            return searchElements;
+        } else {
+            return;
         }
     }
 
     return (
         <div className='add-transaction-dialog-content'>
             <h1>Add Transaction</h1>
-            <input
-                type='text'
-                placeholder='Search Investment...'
-                value={stockId}
-                onChange={(e) => setStockId(e.target.value)}
-            />
+            <div className={searchActive ? "search active" : "search"}>
+                <input
+                    type='text'
+                    placeholder='Search Investment...'
+                    value={selectedStockData ? selectedStockData : stockSearch}
+                    onChange={(e) => {
+                        setStockSearch(e.target.value);
+                    }}
+                />
+                {searchActive && <div>{returnFuzzySearchData()}</div>}
+            </div>
             <div className='input-fields'>
                 <div>
                     <p>Market Price</p>

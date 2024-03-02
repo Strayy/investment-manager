@@ -71,7 +71,7 @@ function Portfolio() {
 
                 // Formats data to be added to portfolioData
                 portfolioData[exchange]["data"].push([
-                    ticker === "RAT" ? "🐀" : ticker,
+                    ticker,
                     stockData["amount"],
                     Math.round(pricingDataJson["latestPrice"]["adjClose"] * 100) / 100,
                     Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,

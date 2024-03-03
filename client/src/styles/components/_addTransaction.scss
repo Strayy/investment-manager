@@ -29,9 +29,7 @@
                 border: 2px solid #002945;
                 border-top: none;
                 box-sizing: border-box;
-
                 top: 100%;
-                
                 width: 100%;
                 position: absolute;
                 z-index: 1002;
@@ -42,7 +40,6 @@
                     background-color: #00111c;
                     transition: all 0.3s ease;
                     cursor: pointer;
-
                     display: flex;
                     flex-direction: row;
                     gap: 0.5em;

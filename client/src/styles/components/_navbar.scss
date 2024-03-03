@@ -10,6 +10,12 @@
     flex-direction: column;
     justify-content: flex-start;
 
+    overflow: visible;
+
+    *:not(i) {
+        overflow: visible;
+    }
+
     .logo {
         padding: 0;
         height: 3em;
@@ -29,6 +35,42 @@
         }
     }
 
+    .tabs div, .tab-end div {
+        position: relative;
+
+        &:hover span {
+            opacity: 100%;
+            visibility: visible;
+        }
+
+        span {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            padding: 0.5em;
+            margin-left: 0.75em;
+            transition: all 0.3s ease;
+            opacity: 0%;
+            visibility: hidden;
+            background-color: #195075;
+            border-radius: 5px;
+            z-index: 10000;
+            white-space: nowrap;
+
+            &::after {
+                content: " ";
+                position: absolute;
+                top: 50%;
+                right: 100%;
+                margin-top: -7.5px;
+                border-width: 7.5px;
+                border-style: solid;
+                border-color: transparent #195075 transparent transparent;
+            }
+        }
+    }
+
     .tabs {
         margin-top: 1em;
         flex-grow: 1;
@@ -36,7 +78,7 @@
         flex-direction: column;
         gap: 0.5em;
 
-        a {
+        div {
             padding: 0.5em;
             cursor: pointer;
             border-radius: 5px;

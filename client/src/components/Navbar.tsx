@@ -13,7 +13,16 @@ function NavBar() {
 
             <div className='tabs'>
                 <Link to='/portfolio'>
-                    <i className='fi fi-rr-rectangle-list'></i>
+                    <div>
+                        <i className='fi fi-rr-rectangle-list'></i>
+                        <span>Portfolio</span>
+                    </div>
+                </Link>
+                <Link to='/transactions'>
+                    <div>
+                        <i className='fi fi-rr-time-past'></i>
+                        <span>Transactions</span>
+                    </div>
                 </Link>
             </div>
 
@@ -21,6 +30,7 @@ function NavBar() {
                 <Link to='/portfolio/buy'>
                     <div>
                         <i className='fi fi-rr-plus-hexagon'></i>
+                        <span>Add Transaction</span>
                     </div>
                 </Link>
             </div>

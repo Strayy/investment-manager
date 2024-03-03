@@ -6,7 +6,7 @@ import NavBar from "../components/Navbar";
 function Layout() {
     return (
         <div className='layout'>
-            <div className='navbar'>
+            <div className='navbar' style={{ overflow: "visible" }}>
                 <NavBar />
             </div>
             <div className='content'>

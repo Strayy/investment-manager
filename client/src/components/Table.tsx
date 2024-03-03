@@ -167,7 +167,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                     {data !== null && (
                         <>
                             {data.headings && <tr className='headings'>{returnHeadings()}</tr>}
-                            {isLoading ? (
+                            {isLoading && data.settings?.lazyLoad === true ? (
                                 <SkeletonLoading
                                     skeletonStyle='table-rows'
                                     tableColumns={8}

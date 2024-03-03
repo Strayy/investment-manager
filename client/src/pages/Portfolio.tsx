@@ -108,7 +108,7 @@ function Portfolio() {
                 sortable: false,
                 multiSelect: false,
                 multiSelectSection: false,
-                lazyLoad: false,
+                lazyLoad: true,
                 lockSectionHeadingOnScroll: false,
                 sortBySection: false,
                 filterBySection: false,

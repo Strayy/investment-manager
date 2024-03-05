@@ -12,27 +12,34 @@ function AddTransaction({
     successAction: () => void;
     totalPortfolioValue?: number | null;
 }) {
+    // State for input fields
     const [stockSearch, setStockSearch] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
     const [marketPrice, setMarketPrice] = useState<string>("");
     const [date, setDate] = useState<string>(new Date().toISOString().split("T")[0]);
 
+    // Handle state for stock search functionality.
     const [searchActive, setSearchActive] = useState<boolean>(false);
     const [fuzzySearchData, setFuzzySearchData] = useState<FuzzySearchResponse[] | undefined>();
     const [selectedStockData, setSelectedStockData] = useState<null | string>(null);
 
+    // Handle state for conditionally rendering loading spinner and error message.
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
+    // Handle abort controller for cancelling requests on update.
     const abortControllerRef = useRef<null | AbortController>(null);
 
+    // Hide fuzzy search results if a stock is selected from the list by a user.
     useEffect(() => {
         setSearchActive(false);
     }, [selectedStockData]);
 
+    // When changing the stock search input, fuzzy search database of stocks.
     useEffect(() => {
         setSelectedStockData(null);
 
+        // Fuzzy search database with abort controller to handle input changes and pending requests.
         const searchRequest = async () => {
             try {
                 const newAbortController = new AbortController();
@@ -62,12 +69,14 @@ function AddTransaction({
             }
         };
 
+        // Only search stocks if input has text or numbers.
         if (stockSearch.trim() !== "") {
             searchRequest();
         } else {
             setSearchActive(false);
         }
 
+        // Abort pending requests if input is updated. Cancels all existing requests so that only the most recent is allowed to run.
         return () => {
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
@@ -75,6 +84,7 @@ function AddTransaction({
         };
     }, [stockSearch]);
 
+    // Add transaction to the user's account.
     async function addTransaction() {
         try {
             setIsLoading(true);
@@ -117,6 +127,7 @@ function AddTransaction({
         }
     }
 
+    // Fuzzy search stocks based on search query. Returns a list of elements representing the 5 returned stocks.
     function returnFuzzySearchData() {
         if (fuzzySearchData) {
             const searchElements: JSX.Element[] = [];
@@ -153,6 +164,7 @@ function AddTransaction({
         }
     }
 
+    // Sanitize number input to ensure it only contains numbers and at most one decimal point.
     function sanitizeInput(
         input: string,
         stateReference: React.Dispatch<React.SetStateAction<string>>,
@@ -212,6 +224,7 @@ function AddTransaction({
                 </div>
             </div>
 
+            {/* If totalPortfolioValue is not null or undefined, show total transaction value. I.e., portfolio value before and after transaction, and conditionally style/calculate based on transaction type. */}
             {totalPortfolioValue !== null && totalPortfolioValue !== undefined && (
                 <div className='total'>
                     <p>Portfolio Summary:</p>

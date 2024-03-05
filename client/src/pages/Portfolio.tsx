@@ -72,12 +72,12 @@ function Portfolio() {
                 // Formats data to be added to portfolioData
                 portfolioData[exchange]["data"].push([
                     ticker,
-                    stockData["amount"],
-                    Math.round(pricingDataJson["latestPrice"]["adjClose"] * 100) / 100,
-                    Math.round(pricingDataJson["dailyChange"]["percentage"] * 100) / 100,
-                    Math.round(pricingDataJson["ytd"]["percentage"] * 100) / 100,
-                    stockData["averageBuyPrice"],
-                    Math.round(stockData["percentage"] * 10) / 10,
+                    Math.round(stockData["amount"] * 100) / 100,
+                    pricingDataJson["latestPrice"]["adjClose"].toFixed(2),
+                    pricingDataJson["dailyChange"]["percentage"].toFixed(2),
+                    pricingDataJson["ytd"]["percentage"].toFixed(2),
+                    stockData["averageBuyPrice"].toFixed(2),
+                    stockData["percentage"].toFixed(0),
                     new Date(latestTransactionJson[stockKey].date).toLocaleDateString("en-GB"),
                 ]);
 

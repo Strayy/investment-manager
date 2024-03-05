@@ -5,16 +5,16 @@ export type Section = {
 };
 
 type AllowedStyles =
-    | "bold"
-    | "italics"
-    | "underline"
-    | "color"
-    | "percentage"
-    | "iconsFront"
-    | "iconsEnd"
-    | "stripNegativeSign"
-    | "alignLeft"
-    | "alignRight";
+    | "bold" // SUPPORTED
+    | "italics" // SUPPORTED
+    | "underline" // SUPPORTED
+    | "color" // SUPPORTED
+    | "percentage" // SUPPORTED
+    | "iconsFront" // SUPPORTED
+    | "iconsEnd" // SUPPORTED
+    | "stripNegativeSign" // SUPPORTED
+    | "alignLeft" // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
+    | "alignRight"; // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
 
 export interface ITableData {
     headings?: string[];
@@ -22,15 +22,17 @@ export interface ITableData {
         [key: string]: Section;
     };
     settings?: {
-        collapsable?: boolean;
-        sortable?: boolean;
-        multiSelect?: boolean;
-        multiSelectSection?: boolean;
-        lazyLoad?: boolean;
-        lockSectionHeadingOnScroll?: boolean;
-        sortBySection?: boolean;
-        filterBySection?: boolean;
-        styleColumnsByValue?: number[][];
-        columnStyling?: AllowedStyles[][];
+        collapsable?: boolean; // NOT SUPPORTED
+        sortable?: boolean; // NOT SUPPORTED - ENABLED BY DEFAULT
+        multiSelect?: boolean; // NOT SUPPORTED
+        multiSelectSection?: boolean; // NOT SUPPORTED
+        lazyLoad?: boolean; // SUPPORTED
+        lockSectionHeadingOnScroll?: boolean; // SUPPORTED
+        sortBySection?: boolean; // NOT SUPPORTED - INTEGRATE WITH SECTION HEADINGS. ADD CHECK TO SEE IF SECTION HEADING EXISTS FIRST
+        filterBySection?: boolean; // NOT SUPPORTED
+        styleColumnsByValue?: number[][]; // SUPPORTED
+        columnStyling?: AllowedStyles[][]; // SUPPORTED
+        defaultSortOrder?: "asc" | "desc"; // SUPPORTED
+        defaultSortIndex?: number; // SUPPORTED
     };
 }

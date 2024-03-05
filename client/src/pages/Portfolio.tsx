@@ -80,6 +80,9 @@ function Portfolio() {
                     Math.round(stockData["percentage"] * 10) / 10,
                     new Date(latestTransactionJson[stockKey].date).toLocaleDateString("en-GB"),
                 ]);
+
+                portfolioData[exchange]["heading"] = exchange;
+                portfolioData[exchange]["importance"] = 1;
             }
 
             setPortfolioData(portfolioData);
@@ -109,7 +112,7 @@ function Portfolio() {
                 multiSelect: false,
                 multiSelectSection: false,
                 lazyLoad: true,
-                lockSectionHeadingOnScroll: false,
+                lockSectionHeadingOnScroll: true,
                 sortBySection: false,
                 filterBySection: false,
                 styleColumnsByValue: [[0], [3, 4], [6]],
@@ -118,6 +121,8 @@ function Portfolio() {
                     ["color", "percentage", "iconsFront", "stripNegativeSign"],
                     ["percentage"],
                 ],
+                defaultSortOrder: "desc",
+                defaultSortIndex: 6,
             },
         });
     }, [portfolioData]);

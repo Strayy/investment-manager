@@ -1,8 +1,32 @@
+import { useEffect, useState } from "react";
 import { ITableData, Section } from "../types/tableData";
 
 import SkeletonLoading from "./SkeletonLoading";
 
 function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boolean }): JSX.Element {
+    const [columnSortOrder, setColumnSortOrder] = useState<boolean | null>(null);
+    const [columnSortIndex, setColumnSortIndex] = useState<number | null>(null);
+
+    const [headingElements, setHeadingElements] = useState<JSX.Element[] | undefined>();
+    const [dataElements, setDataElements] = useState<JSX.Element[][][] | undefined>();
+
+    // Set default column sort based on settings in ITableData
+    useEffect(() => {
+        if (data?.settings?.defaultSortOrder !== undefined) {
+            setColumnSortOrder(data.settings.defaultSortOrder === "asc" ? true : false);
+        }
+
+        if (data?.settings?.defaultSortIndex !== undefined) {
+            setColumnSortIndex(data.settings.defaultSortIndex);
+        }
+    }, [data]);
+
+    // Update data cells ordering if data or sorting is changed
+    useEffect(() => {
+        setHeadingElements(returnHeadings());
+        setDataElements(returnSections());
+    }, [data, columnSortIndex, columnSortOrder]);
+
     // Style table cell based on styleColumnsByValue and columnStyling data
     function styleCell(dataContent: string | number, columnIndex: number) {
         // Returns the corresponding array index in styleColumnsByValue for cell index. I.e., first column (cell index 0) in [[1], [2], [0]] equals 2. Returns -1 if it doesn't exist.
@@ -92,7 +116,26 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
         const thElements: JSX.Element[] = [];
 
         data?.headings?.forEach((heading: string, index: number) => {
-            thElements.push(<th key={`heading-${index}`}>{heading}</th>);
+            thElements.push(
+                <th key={`heading-${index}`}>
+                    <div
+                        onClick={() => {
+                            setColumnSortOrder(
+                                index !== columnSortIndex ? false : !columnSortOrder,
+                            );
+                            setColumnSortIndex(index);
+                        }}
+                    >
+                        <p>{heading}</p>
+                        {columnSortIndex !== null &&
+                            columnSortIndex === index &&
+                            !columnSortOrder && <i className='fi fi-rr-caret-down'></i>}
+                        {columnSortIndex !== null &&
+                            columnSortIndex === index &&
+                            columnSortOrder && <i className='fi fi-rr-caret-up'></i>}
+                    </div>
+                </th>,
+            );
         });
 
         return thElements;
@@ -112,9 +155,11 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                     sectionElement.push([
                         <tr
                             key={`section-${sectionIndex}-heading`}
-                            className={
-                                section[1].importance ? `importance-${section[1].importance}` : ""
-                            }
+                            className={`${
+                                section[1].importance
+                                    ? `importance-${section[1].importance} section-header`
+                                    : "section-header"
+                            } ${data.settings?.lockSectionHeadingOnScroll ? "section-header-sticky" : ""}`}
                         >
                             {section[1].heading && (
                                 <td colSpan={section[1].data[0].length}>{section[1].heading}</td>
@@ -122,34 +167,86 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                         </tr>,
                     ]);
 
-                    // Loops through rows in the section
-                    section[1].data.forEach(
-                        (sectionData: (string | number)[], rowIndex: number) => {
-                            const sectionRow: JSX.Element[] = [];
+                    const sortData: { [key: string | number]: (string | number)[][] } = {};
 
-                            // Loops through the data to be inputted into the section row
-                            sectionData.forEach(
-                                (sectionDataItem: string | number, index: number) => {
-                                    // Conditionally checks if cell styling is specified in table data prop and attempts to style all cells if true. Otherwise, no point attempting to style so just pushes the data to array.
-                                    sectionRow.push(
-                                        <td
-                                            key={`section-${sectionIndex}-row-${rowIndex}-column-${index}`}
-                                        >
-                                            {data?.settings?.styleColumnsByValue &&
-                                            data?.settings.columnStyling
-                                                ? styleCell(sectionDataItem, index)
-                                                : sectionDataItem}
-                                        </td>,
-                                    );
-                                },
+                    if (columnSortIndex !== null) {
+                        section[1].data.forEach((sectionData: (string | number)[]) => {
+                            if (!sortData[sectionData[columnSortIndex]]) {
+                                sortData[sectionData[columnSortIndex]] = [];
+                            }
+
+                            sortData[sectionData[columnSortIndex]].push(sectionData);
+                        });
+                    }
+
+                    const createDataRow = (sectionData: (string | number)[], rowIndex: number) => {
+                        const sectionRow: JSX.Element[] = [];
+
+                        sectionData.forEach((sectionDataItem: string | number, index: number) => {
+                            // Conditionally checks if cell styling is specified in table data prop and attempts to style all cells if true. Otherwise, no point attempting to style so just pushes the data to array.
+                            sectionRow.push(
+                                <td key={`section-${sectionIndex}-row-${rowIndex}-column-${index}`}>
+                                    {data?.settings?.styleColumnsByValue &&
+                                    data?.settings.columnStyling
+                                        ? styleCell(sectionDataItem, index)
+                                        : sectionDataItem}
+                                </td>,
                             );
+                        });
 
-                            // Adds section row to the section array.
-                            sectionElement.push([
-                                <tr key={`section-${sectionIndex}-row`}>{sectionRow}</tr>,
-                            ]);
-                        },
-                    );
+                        sectionElement.push([
+                            <tr key={`section-${sectionIndex}-row`}>{sectionRow}</tr>,
+                        ]);
+                    };
+
+                    // Check to see if data should be sorted and create sortIndexes array containing sorted sortIndex keys if true. If false, loop through dataRows in section and create data row.
+                    if (columnSortIndex !== null) {
+                        const sortedIndexes = Object.keys(sortData)
+                            .slice()
+                            .sort((a: string, b: string) => {
+                                // Sorts string items and throws error if value is anything other than a string
+                                if (typeof a === "string" && typeof b === "string") {
+                                    // If string contains more than 1 "/" character and represents a date
+                                    if (a.split("/").length > 1 && b.split("/").length > 1) {
+                                        const [dayA, monthA, yearA] = a.split("/").map(Number);
+                                        const [dayB, monthB, yearB] = b.split("/").map(Number);
+
+                                        return (
+                                            new Date(yearA, monthA - 1, dayA).getTime() -
+                                            new Date(yearB, monthB - 1, dayB).getTime()
+                                        );
+                                    }
+
+                                    // If not in date format, attempt to compare as a number. If not a number, compare as a string.
+                                    const numA = parseFloat(a);
+                                    const numB = parseFloat(b);
+
+                                    if (!isNaN(numA) && !isNaN(numB)) {
+                                        return numA - numB;
+                                    } else {
+                                        return a.localeCompare(b);
+                                    }
+                                } else {
+                                    throw new Error("Unsupported data types in the array");
+                                }
+                            });
+
+                        // If columnSortOrder is set to "desc", reverse sortedIndexes
+                        if (columnSortOrder === false) {
+                            sortedIndexes.reverse();
+                        }
+
+                        // Loop through sorted indexes
+                        sortedIndexes.forEach((sortedIndex: string | number) => {
+                            sortData[sortedIndex].forEach((dataRow, rowIndex) => {
+                                createDataRow(dataRow, rowIndex);
+                            });
+                        });
+                    } else {
+                        section[1].data.forEach((dataRow, rowIndex) => {
+                            createDataRow(dataRow, rowIndex);
+                        });
+                    }
 
                     // Adds entire section (section heading + section data) to sections array.
                     sections.push(sectionElement);
@@ -163,10 +260,14 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
     return (
         <div className='table-component'>
             <table>
+                <thead>
+                    {data !== null && (
+                        <>{data.headings && <tr className='headings'>{headingElements}</tr>}</>
+                    )}
+                </thead>
                 <tbody>
                     {data !== null && (
                         <>
-                            {data.headings && <tr className='headings'>{returnHeadings()}</tr>}
                             {isLoading && data.settings?.lazyLoad === true ? (
                                 <SkeletonLoading
                                     skeletonStyle='table-rows'
@@ -174,7 +275,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                                     tableRows={4}
                                 />
                             ) : (
-                                returnSections()
+                                dataElements
                             )}
                         </>
                     )}

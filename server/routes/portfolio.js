@@ -165,25 +165,30 @@ router.get("/getHoldings", async (req, res) => {
                     }
                 });
 
-                holdings[stock] = {
-                    amount: amount,
-                    averageBuyPrice: Number(avgPrice.toFixed(2)),
-                };
-
                 const recentPricing = await axios.get(
                     `http://localhost:${process.env.PORT}/api/stock/recentPricing?stock=${stock}`,
                 );
 
-                latestPricing[stock] = recentPricing.data.latestPrice.adjClose;
+                if (amount !== 0) {
+                    holdings[stock] = {
+                        amount: amount,
+                        averageBuyPrice: Number(avgPrice.toFixed(2)),
+                    };
 
-                totalPortfolioValue += recentPricing.data.latestPrice.adjClose * amount;
+                    latestPricing[stock] = recentPricing.data.latestPrice.adjClose;
+
+                    totalPortfolioValue += recentPricing.data.latestPrice.adjClose * amount;
+                }
             }),
         );
 
         await Promise.all(
             distinctValues.map((stock) => {
-                holdings[stock]["percentage"] =
-                    ((latestPricing[stock] * holdings[stock].amount) / totalPortfolioValue) * 100;
+                if (holdings[stock]) {
+                    holdings[stock]["percentage"] =
+                        ((latestPricing[stock] * holdings[stock].amount) / totalPortfolioValue) *
+                        100;
+                }
             }),
         );
 

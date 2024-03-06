@@ -1,5 +1,5 @@
 export type Section = {
-    importance?: number;
+    importance?: 1;
     heading?: string;
     data: (string | number)[][];
 };

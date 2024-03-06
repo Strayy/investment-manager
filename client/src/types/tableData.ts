@@ -17,7 +17,7 @@ type AllowedStyles =
     | "alignRight"; // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
 
 export interface ITableData {
-    headings?: string[];
+    headings: string[];
     sections?: {
         [key: string]: Section;
     };

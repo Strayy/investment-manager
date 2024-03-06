@@ -271,7 +271,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                             {isLoading && data.settings?.lazyLoad === true ? (
                                 <SkeletonLoading
                                     skeletonStyle='table-rows'
-                                    tableColumns={8}
+                                    tableColumns={data.headings.length}
                                     tableRows={4}
                                 />
                             ) : (

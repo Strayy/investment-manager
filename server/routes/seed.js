@@ -123,6 +123,7 @@ router.post("/testUser", async (req, res) => {
                     await userModel.create({
                         id: "TEST-USER-ID",
                         ...jsonArray,
+                        favourites: [],
                     });
                 } else {
                     failedImport.push({

@@ -15,6 +15,10 @@ router.use("/portfolio", portfolioRouter);
 const stocksRouter = require("./stocks");
 router.use("/stock", stocksRouter);
 
+// USERS ENDPOINTS
+const usersRouter = require("./user");
+router.use("/users", usersRouter);
+
 //TODO - Update stock price data endpoint to return from db
 // RETURN STOCK PRICE DATA
 router.get("/getData/:ticker", async (req, res) => {

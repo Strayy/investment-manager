@@ -5,9 +5,9 @@ const axios = require("axios");
 
 router.use(bodyParser.json());
 
-const portfolioModel = require("../models/portfolioModel");
-
 const exchangeSettings = require("../data/exchangeSettings");
+
+const portfolioModel = require("../models/portfolioModel");
 const stocksModel = require("../models/stocksModel");
 const userModel = require("../models/userModel");
 

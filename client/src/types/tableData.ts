@@ -14,7 +14,8 @@ type AllowedStyles =
     | "iconsEnd" // SUPPORTED
     | "stripNegativeSign" // SUPPORTED
     | "alignLeft" // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
-    | "alignRight"; // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
+    | "alignRight" // SUPPORTED FOR NON COLOR-STYLED VALUES - COLOR-STYLED VALUES DEFAULT TO CENTRE ALIGNMENT
+    | "styleBuySell";
 
 export interface ITableData {
     headings: string[];

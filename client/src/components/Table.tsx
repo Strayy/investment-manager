@@ -89,9 +89,19 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                                   ? "color-data style-negative"
                                   : "color-data style-neutral"
                             : ""
-                    } ${
-                        columnStyling?.[arrayIndex].includes("alignLeft") ? "align-left-data" : ""
-                    } ${
+                    }
+                    
+                    ${
+                        columnStyling?.[arrayIndex].includes("styleBuySell") &&
+                        dataContent !== undefined &&
+                        typeof dataContent === "string" &&
+                        ["buy", "sell"].includes(dataContent.toLowerCase())
+                            ? dataContent.toLowerCase() === "buy"
+                                ? "color-data style-positive"
+                                : "color-data style-negative"
+                            : ""
+                    }
+                    ${columnStyling?.[arrayIndex].includes("alignLeft") ? "align-left-data" : ""} ${
                         columnStyling?.[arrayIndex].includes("alignRight") ? "align-right-data" : ""
                     }`}
                 >

@@ -91,7 +91,7 @@ function Transactions() {
                 styleColumnsByValue: [[0], [1], [6]],
                 columnStyling: [
                     ["bold", "alignLeft"],
-                    ["color"],
+                    ["styleBuySell"],
                     ["color", "percentage", "iconsFront", "stripNegativeSign"],
                 ],
                 defaultSortOrder: "desc",

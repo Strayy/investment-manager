@@ -26,6 +26,37 @@ let cookies, crumb;
     }
 })();
 
+// GET STOCK PROFILE
+router.get("/getStockProfile", async (req, res) => {
+    try {
+        // Throw an error if stockId is not given in request.
+        if (!req.query.stockId) {
+            throw new Error("No stockId specified in request query");
+        }
+
+        // Search existing stock profiles for stockId.
+        let stockProfile = await stocksModel.find({ id: req.query.stockId });
+
+        // Throw an error if no stock is found with specified stockId
+        if (stockProfile.length === 0) {
+            throw new Error(`Stock ${req.query.stockId} not found.`);
+        }
+
+        // If website does not exist, create profile for stock.
+        if (!stockProfile[0].website) {
+            const createProfileResponse = await axios.post(
+                `http://localhost:${process.env.PORT}/api/stock/createStockProfile?stock=${req.query.stockId}`,
+            );
+
+            stockProfile = [createProfileResponse.data.data];
+        }
+
+        res.status(200).json(stockProfile[0]);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
 // CREATE STOCK PROFILE
 router.post("/createStockProfile", async (req, res) => {
     try {

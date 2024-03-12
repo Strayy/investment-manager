@@ -30,34 +30,4 @@ router.get("/getData/:ticker", async (req, res) => {
     }
 });
 
-// TODO - Integrate into database/seed files until branding API is connected
-// RETURN COMPANY INFORMATION
-router.get("/getCompanyData/", async (req, res) => {
-    res.send(
-        JSON.stringify({
-            TSLA: {
-                ticker: "TSLA",
-                name: "Tesla",
-                color: "#cc0000",
-                companyLogo: "https://asset.brandfetch.io/id2S-kXbuK/iduZOzPw94.png",
-                companyWebsite: "https://tesla.com/",
-            },
-            MSFT: {
-                ticker: "MSFT",
-                name: "Microsoft",
-                color: "#0067b8",
-                companyLogo: "https://asset.brandfetch.io/idchmboHEZ/id0K98Gag1.png",
-                companyWebsite: "https://microsoft.com/",
-            },
-            AAPL: {
-                ticker: "AAPL",
-                name: "Apple",
-                color: "#0066CC",
-                companyLogo: "https://asset.brandfetch.io/idnrCPuv87/id3SVF6ez4.png",
-                companyWebsite: "https://apple.com/",
-            },
-        }),
-    );
-});
-
 module.exports = router;

@@ -1,71 +1,62 @@
 import hexRgb from "hex-rgb";
 import { useEffect, useState } from "react";
 
+import { Favourites } from "../types/favourites";
+
 function Watchlist() {
-    const [investments, setInvestments] = useState<
-        {
-            ticker: string;
-            name: string;
-            color: string;
-            currentPrice: string;
-            change: GLfloat;
-            companyLogo: string;
-            companyWebsite: string;
-        }[]
-    >([
-        {
-            ticker: "TSLA",
-            name: "Tesla",
-            color: "#cc0000",
-            currentPrice: "$185.90",
-            change: 2.97,
-            companyLogo: "https://asset.brandfetch.io/id2S-kXbuK/iduZOzPw94.png",
-            companyWebsite: "https://tesla.com/",
-        },
-        {
-            ticker: "MSFT",
-            name: "Microsoft",
-            color: "#0067b8",
-            currentPrice: "$289.84",
-            change: 2.24,
-            companyLogo: "https://asset.brandfetch.io/idchmboHEZ/id0K98Gag1.png",
-            companyWebsite: "https://microsoft.com/",
-        },
-        {
-            ticker: "AAPL",
-            name: "Apple",
-            color: "#0066CC",
-            currentPrice: "$165.56",
-            change: 3.41,
-            companyLogo: "https://asset.brandfetch.io/idnrCPuv87/id3SVF6ez4.png",
-            companyWebsite: "https://apple.com/",
-        },
-    ]);
+    const [investments, setInvestments] = useState<Favourites>({});
 
-    // useEffect(() => {
-    //     investments.forEach(async (item) => {
-    //         await fetch(`https://api.polygon.io/v2/aggs/ticker/${item.ticker}/prev?adjusted=true&apiKey=g2KWbQclgLr8UP1sUBN4gk3Ml4ciO32I`, {
-    //             method: 'GET'
-    //         })
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             let investmentsArray = investments.splice(investments.indexOf(item), 1);
+    useEffect(() => {
+        const getFavourites = async () => {
+            const rawFavouritesData = await fetch(
+                `${process.env.REACT_APP_SERVER_ADDRESS}users/favourites?userId=TEST-USER-ID`,
+            );
+            const dataJson = await rawFavouritesData.json();
 
-    //             // setInvestments(...investments, )
-    //             item.currentPrice = data.results.c;
-    //             item.change = (data.results.c - data.results.o) / data.results.o * 100;
+            const favouritesList: Favourites = {};
 
-    //         })
-    //     });
-    // }, []);
+            for (const stockId of dataJson) {
+                const stockProfileData = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/getStockProfile?stockId=${stockId}`,
+                );
+
+                const stockProfileJson = await stockProfileData.json();
+
+                const stockPerformanceData = await fetch(
+                    `${process.env.REACT_APP_SERVER_ADDRESS}stock/recentPricing?stock=${stockId}`,
+                );
+
+                const stockPerformanceJson = await stockPerformanceData.json();
+
+                favouritesList[stockId] = {
+                    stockId: stockId,
+                    name: stockProfileJson.name,
+                    color: stockProfileJson.colors.accent || "#002945",
+                    currentPrice: new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }).format(stockPerformanceJson.latestPrice.close),
+                    change: Math.round(stockPerformanceJson.dailyChange.percentage * 100) / 100,
+                    companyLogo: stockProfileJson.logos.light_symbol,
+                    companyWebsite: stockProfileJson.website || "#",
+                };
+            }
+
+            setInvestments(favouritesList);
+        };
+
+        getFavourites();
+    }, []);
 
     function returnWatchListItems() {
         const watchListItems: JSX.Element[] = [];
 
-        investments.forEach((item) => {
+        Object.values(investments).forEach((item) => {
             watchListItems.push(
                 <div
-                    key={item.ticker}
+                    key={item.stockId}
                     className='watchlist-item'
                     style={{
                         backgroundImage: `linear-gradient(to top right, rgba(
@@ -78,10 +69,31 @@ function Watchlist() {
                         border: `2px solid ${item.color}`,
                     }}
                 >
-                    <i className='fi fi-ss-star'></i>
+                    <i
+                        className='fi fi-ss-star'
+                        onClick={async () => {
+                            await fetch(
+                                `${process.env.REACT_APP_SERVER_ADDRESS}users/changeFavourites`,
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        userId: "TEST-USER-ID",
+                                        stockId: item.stockId,
+                                    }),
+                                },
+                            );
+
+                            const newInvestments = { ...investments };
+                            delete newInvestments[item.stockId];
+                            setInvestments(newInvestments);
+                        }}
+                    ></i>
                     <div className='watchlist-item-inner'>
                         <span>
-                            <p className='ticker'>{item.ticker}</p>
+                            <p className='ticker'>{item.stockId.replace("_", ": ")}</p>
                             <p className='name'>{item.name}</p>
                         </span>
                         <span>
@@ -107,7 +119,14 @@ function Watchlist() {
                         rel='noreferrer'
                     >
                         <div className='company-logo'>
-                            <img src={item.companyLogo} alt={item.name + " Logo"} />
+                            <img
+                                src={
+                                    item.companyLogo ||
+                                    "https://icons.veryicon.com/png/o/business/oa-attendance-icon/company-27.png"
+                                }
+                                alt={item.name + " Logo"}
+                                className={!item.companyLogo ? "logo-white" : ""}
+                            />
                         </div>
                     </a>
                 </div>,
@@ -119,9 +138,10 @@ function Watchlist() {
 
     return (
         <div className='watchlist-container'>
-            {investments.length === 0 ? (
+            {Object.keys(investments).length === 0 ? (
                 <div className='no-watchlist-item'>
-                    <p>Add Watchlist Item</p>
+                    <i className='fi fi-rr-eye'></i>
+                    <h3>Watchlist Empty</h3>
                 </div>
             ) : (
                 returnWatchListItems()

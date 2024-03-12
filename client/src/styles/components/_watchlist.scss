@@ -6,17 +6,33 @@
     flex-direction: row;
     gap: 1em;
 
-    > div {
+    > div:not(.no-watchlist-item) {
         border-radius: 0.5em;
         height: calc(100% - 6px);
-        max-width: calc((100% - 5em - 24px) / 6);
-        min-width: calc((100% - 5em - 24px) / 6);
+        width: calc((100% - 5em - 24px) / 6);
+        min-width: 11.5em;
         position: relative;
     }
 
     .no-watchlist-item {
-        color: red;
         border: 3px solid #002945;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 0.5em;
+        height: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        i, h3 {
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        i {
+            font-size: 2em;
+        }
     }
 
     .watchlist-item {
@@ -58,15 +74,15 @@
                 .current-price {
                     font-weight: 400;
                     font-size: 1.5em;
-                    font-family: 'Courier New', Courier, monospace;
+                    font-family: "Courier New", Courier, monospace;
                 }
-    
+
                 .change {
                     display: flex;
                     align-items: row;
                     gap: 0.5em;
-                    font-family: 'Courier New', Courier, monospace;
-    
+                    font-family: "Courier New", Courier, monospace;
+
                     i {
                         display: flex;
                         align-items: center;
@@ -81,10 +97,14 @@
             right: 1em;
             bottom: 1em;
             cursor: pointer;
-            
+
             img {
                 max-height: 2em;
                 max-width: 6em;
+
+                &.logo-white {
+                    filter: brightness(0) invert(1);
+                }
             }
         }
     }

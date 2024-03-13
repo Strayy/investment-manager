@@ -1,5 +1,5 @@
 export type SkeletonLoadingProps = {
-    skeletonStyle?: "table-rows";
-    tableColumns: number;
-    tableRows: number;
+    skeletonStyle: "table-rows" | undefined;
+    tableColumns?: number;
+    tableRows?: number;
 };

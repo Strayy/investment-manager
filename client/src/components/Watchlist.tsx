@@ -1,10 +1,13 @@
 import hexRgb from "hex-rgb";
 import { useEffect, useState } from "react";
 
+import SkeletonLoading from "./SkeletonLoading";
+
 import { Favourites } from "../types/favourites";
 
 function Watchlist() {
     const [investments, setInvestments] = useState<Favourites>({});
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const getFavourites = async () => {
@@ -45,6 +48,7 @@ function Watchlist() {
             }
 
             setInvestments(favouritesList);
+            setIsLoading(false);
         };
 
         getFavourites();
@@ -138,13 +142,17 @@ function Watchlist() {
 
     return (
         <div className='watchlist-container'>
-            {Object.keys(investments).length === 0 ? (
-                <div className='no-watchlist-item'>
-                    <i className='fi fi-rr-eye'></i>
-                    <h3>Watchlist Empty</h3>
-                </div>
+            {!isLoading ? (
+                Object.keys(investments).length === 0 ? (
+                    <div className='no-watchlist-item'>
+                        <i className='fi fi-rr-eye'></i>
+                        <h3>Watchlist Empty</h3>
+                    </div>
+                ) : (
+                    returnWatchListItems()
+                )
             ) : (
-                returnWatchListItems()
+                <SkeletonLoading skeletonStyle={undefined} />
             )}
         </div>
     );

@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
+const { v4: uuidv4 } = require("uuid");
 
 import "../styles/components/_addTransaction.scss";
 import { FuzzySearchResponse } from "../types/fuzzySearchResponseData";
+
+import { Context } from "../App";
 
 function AddTransaction({
     transactionMode,
@@ -12,6 +15,9 @@ function AddTransaction({
     successAction: () => void;
     totalPortfolioValue?: number | null;
 }) {
+    // Get context for toast messages
+    const [toastElements, setToastElements] = useContext(Context);
+
     // State for input fields
     const [stockSearch, setStockSearch] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
@@ -84,6 +90,11 @@ function AddTransaction({
         };
     }, [stockSearch]);
 
+    // Add toast notification
+    function addNotification(toastMessage: string) {
+        setToastElements([...toastElements, { id: uuidv4(), message: toastMessage }]);
+    }
+
     // Add transaction to the user's account.
     async function addTransaction() {
         try {
@@ -120,6 +131,9 @@ function AddTransaction({
             setTimeout(() => {
                 setIsLoading(false);
                 successAction();
+                addNotification(
+                    `${transactionMode ? "Bought" : "Sold"} ${amount} ${selectedStockData} ${Number(amount) > 1 ? "shares" : "share"}`,
+                );
             }, 3000);
         } catch (err) {
             setError(true);

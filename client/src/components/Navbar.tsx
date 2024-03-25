@@ -24,6 +24,18 @@ function NavBar() {
                         <span>Transactions</span>
                     </div>
                 </Link>
+                <Link to='/'>
+                    <div>
+                        <i className='fi fi-rr-search-alt'></i>
+                        <span>Stock Search</span>
+                    </div>
+                </Link>
+                <Link to='/'>
+                    <div>
+                        <i className='fi fi-rr-megaphone'></i>
+                        <span>News</span>
+                    </div>
+                </Link>
             </div>
 
             <div className='tab-end'>

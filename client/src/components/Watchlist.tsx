@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import SkeletonLoading from "./SkeletonLoading";
 
 import { Favourites } from "../types/favourites";
+import CurrencyWrapper from "./CurrencyWrapper";
 
 function Watchlist() {
     const [investments, setInvestments] = useState<Favourites>({});
@@ -35,15 +36,11 @@ function Watchlist() {
                     stockId: stockId,
                     name: stockProfileJson.name,
                     color: stockProfileJson.colors.accent || "#002945",
-                    currentPrice: new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                    }).format(stockPerformanceJson.latestPrice.close),
+                    currentPrice: stockPerformanceJson.latestPrice.close,
                     change: Math.round(stockPerformanceJson.dailyChange.percentage * 100) / 100,
                     companyLogo: stockProfileJson.logos.light_symbol,
                     companyWebsite: stockProfileJson.website || "#",
+                    currency: stockProfileJson.currency,
                 };
             }
 
@@ -101,7 +98,11 @@ function Watchlist() {
                             <p className='name'>{item.name}</p>
                         </span>
                         <span>
-                            <p className='current-price'>{item.currentPrice}</p>
+                            <CurrencyWrapper
+                                currency={item.currency}
+                                data={item.currentPrice}
+                                className='current-price'
+                            />
                             <p className='change'>
                                 {item.change !== 0 ? (
                                     item.change > 0 ? (

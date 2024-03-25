@@ -7,5 +7,6 @@ export type Favourites = {
         change: number;
         companyLogo: string;
         companyWebsite: string;
+        currency: string;
     };
 };

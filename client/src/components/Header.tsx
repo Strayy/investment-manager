@@ -1,26 +1,37 @@
+import { useContext } from "react";
+
+import { Context } from "../App";
+import { currencies } from "../constants/currencies";
+
 function Header() {
+    const [selectedCurrency, setSelectedCurrency] = useContext(Context).currency;
+
+    function changeCurrency(currency: string) {
+        setSelectedCurrency(currency);
+    }
+
+    function currencyGenerator() {
+        const currencyOptions: any[] = [];
+
+        Object.entries(currencies).forEach((currency) => {
+            currencyOptions.push(
+                <option value={currency[0]} selected={selectedCurrency === currency[0] && true}>
+                    {`${currency[0]} ${currency[1].symbol}`}
+                </option>,
+            );
+        });
+
+        return currencyOptions;
+    }
+
     return (
         <div className='header-container'>
             <span>
                 <input type='text' placeholder='Search...' />
             </span>
             <span>
-                <select>
-                    <option>USD $</option>
-                    <option>EUR €</option>
-                    <option>JPY ¥</option>
-                    <option>GBP £</option>
-                    <option>CNY ¥</option>
-                    <option>AUD $</option>
-                    <option>CAD $</option>
-                    <option>CHF Fr.</option>
-                    <option>HKD $</option>
-                    <option>SGD $</option>
-                    <option>SEK kr</option>
-                    <option>KRW ₩</option>
-                    <option>NOK kr</option>
-                    <option>NZD $</option>
-                    <option>INR ₹</option>
+                <select onChange={(e) => changeCurrency(e.target.value)}>
+                    {currencyGenerator()}
                 </select>
                 <div className='notifications'>
                     {Math.random() < 0.5 ? (

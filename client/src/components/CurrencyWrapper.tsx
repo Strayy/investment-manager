@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { currencies } from "../constants/currencies.ts";
-
-const selectedCurrency = "AUD";
+import { Context } from "../App.tsx";
 
 function CurrencyWrapper({
     currency,
@@ -13,6 +12,12 @@ function CurrencyWrapper({
     data: string | number;
     className?: string;
 }) {
+    const [selectedCurrency, setSelectedCurrency] = useContext(Context).currency;
+
+    useEffect(() => {
+        console.log(selectedCurrency);
+    }, [selectedCurrency]);
+
     const [convertedCurrency, setConvertedCurrency] = useState<number>();
 
     useEffect(() => {
@@ -26,9 +31,7 @@ function CurrencyWrapper({
         }
 
         fetchConversionRate();
-
-        console.log("Convert Currency");
-    }, []);
+    }, [selectedCurrency]);
 
     function formatCurrency() {
         return `${Object.keys(currencies).includes(selectedCurrency) ? currencies[selectedCurrency].symbol : "$"}${Math.round(Number(convertedCurrency) * 100) / 100}`;

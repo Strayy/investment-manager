@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 
 import { IToastMessage } from "./types/toastMessage";
 
@@ -10,13 +10,25 @@ import Dashboard from "./pages/Dashboard";
 import Portfolio from "./pages/Portfolio";
 import Transactions from "./pages/Transactions";
 
-export const Context = createContext<[IToastMessage[], any]>([[], () => null]);
+export const Context = createContext<{
+    toastMessages: [IToastMessage[], any];
+    currency: [string, any];
+}>({
+    toastMessages: [[], () => null],
+    currency: ["USD", () => null],
+});
 
 function App() {
     const [toastMessages, setToastMessages] = useState<IToastMessage[]>([]);
+    const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
 
     return (
-        <Context.Provider value={[toastMessages, setToastMessages]}>
+        <Context.Provider
+            value={{
+                toastMessages: [toastMessages, setToastMessages],
+                currency: [selectedCurrency, setSelectedCurrency],
+            }}
+        >
             <BrowserRouter>
                 <Routes>
                     <Route path='/' element={<Layout />}>

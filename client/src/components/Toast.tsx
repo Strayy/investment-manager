@@ -7,7 +7,7 @@ import ToastElement from "./ToastElement";
 import { IToastMessage } from "../types/toastMessage";
 
 function Toast() {
-    const [toastElements, setToastElements] = useContext(Context);
+    const [toastElements, setToastElements] = useContext(Context).toastMessages;
 
     function removeNotification(toastElementId: string) {
         setToastElements((prev: IToastMessage[]) =>

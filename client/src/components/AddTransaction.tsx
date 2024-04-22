@@ -16,7 +16,7 @@ function AddTransaction({
     totalPortfolioValue?: number | null;
 }) {
     // Get context for toast messages
-    const [toastElements, setToastElements] = useContext(Context);
+    const [toastElements, setToastElements] = useContext(Context).toastMessages;
 
     // State for input fields
     const [stockSearch, setStockSearch] = useState<string>("");

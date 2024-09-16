@@ -10,10 +10,12 @@ function AddTransaction({
     transactionMode,
     successAction,
     totalPortfolioValue,
+    holdings,
 }: {
     transactionMode: boolean;
     successAction: () => void;
     totalPortfolioValue?: number | null;
+    holdings: any;
 }) {
     // Get context for toast messages
     const [toastElements, setToastElements] = useContext(Context).toastMessages;
@@ -178,9 +180,10 @@ function AddTransaction({
         }
     }
 
-    // Sanitize number input to ensure it only contains numbers and at most one decimal point.
+    // Sanitize number input to ensure it only contains numbers and at most one decimal point. Also check if user has enough of a certain stock to sell
     function sanitizeInput(
         input: string,
+        inputType: string,
         stateReference: React.Dispatch<React.SetStateAction<string>>,
     ) {
         const sanitizedValue = input.replace(/[^0-9.]/g, "");
@@ -188,7 +191,23 @@ function AddTransaction({
         const decimalCount = sanitizedValue.split(".").length - 1;
 
         if (decimalCount <= 1) {
-            stateReference(sanitizedValue);
+            if (inputType == "amount") {
+                console.log(true);
+
+                let currentStockHoldings = 0;
+
+                if (selectedStockData) {
+                    currentStockHoldings =
+                        holdings[selectedStockData.replace(" ", "").split(":").join("_")].amount;
+                }
+                if (!transactionMode && Number(sanitizedValue) > currentStockHoldings) {
+                    stateReference(String(currentStockHoldings));
+                } else {
+                    stateReference(sanitizedValue);
+                }
+            } else {
+                stateReference(sanitizedValue);
+            }
         }
     }
 
@@ -215,7 +234,7 @@ function AddTransaction({
                             type='text'
                             placeholder='0.00'
                             value={marketPrice}
-                            onChange={(e) => sanitizeInput(e.target.value, setMarketPrice)}
+                            onChange={(e) => sanitizeInput(e.target.value, "price", setMarketPrice)}
                         />
                     </div>
                 </div>
@@ -226,7 +245,7 @@ function AddTransaction({
                             type='text'
                             placeholder='1'
                             value={amount}
-                            onChange={(e) => sanitizeInput(e.target.value, setAmount)}
+                            onChange={(e) => sanitizeInput(e.target.value, "amount", setAmount)}
                         />
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import Graph from "../components/Graph";
 import Table from "../components/Table";
 import Dialog from "../components/Dialog";
 import AddTransaction from "../components/AddTransaction";
+import CurrencyWrapper from "../components/CurrencyWrapper";
 import { ITableData, Section } from "../types/tableData";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -18,6 +19,13 @@ function Portfolio() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const [totalPortfolioValue, setTotalPortfolioValue] = useState<number | null>(null);
+    const [holdings, setHoldings] = useState<{
+        string: {
+            amount: number;
+            averageBuyPrice: number;
+            percentage: number;
+        };
+    } | null>(null);
 
     // Check link to see if it has the buy param. I.e., /portfolio/buy. If true, open the add transaction dialog. If /portfolio only, do nothing. If /portfolio/anything_else, redirect to the dashboard.
     useEffect(() => {
@@ -44,6 +52,7 @@ function Portfolio() {
             const portfolioData: { [key: string]: Section } = {};
 
             setTotalPortfolioValue(dataJson.portfolio.totalValue);
+            setHoldings(dataJson.holdings);
 
             // Loops through each stock in portfolio
             for (const [stockKey, stockData] of Object.entries(dataJson.holdings) as [
@@ -73,10 +82,18 @@ function Portfolio() {
                 portfolioData[exchange]["data"].push([
                     ticker,
                     Math.round(stockData["amount"] * 100) / 100,
-                    pricingDataJson["latestPrice"]["adjClose"].toFixed(2),
+                    <CurrencyWrapper
+                        currency='AUD'
+                        data={pricingDataJson["latestPrice"]["adjClose"]}
+                        key={stockKey}
+                    />,
                     pricingDataJson["dailyChange"]["percentage"].toFixed(2),
                     pricingDataJson["ytd"]["percentage"].toFixed(2),
-                    stockData["averageBuyPrice"].toFixed(2),
+                    <CurrencyWrapper
+                        currency='AUD'
+                        data={stockData["averageBuyPrice"]}
+                        key={stockKey}
+                    />,
                     stockData["percentage"].toFixed(0),
                     new Date(latestTransactionJson[stockKey].date).toLocaleDateString("en-GB"),
                 ]);
@@ -141,6 +158,7 @@ function Portfolio() {
                             transactionMode={transactionMode}
                             successAction={() => closeDialog()}
                             totalPortfolioValue={totalPortfolioValue}
+                            holdings={holdings}
                         />
                     }
                     closeAction={() => closeDialog()}

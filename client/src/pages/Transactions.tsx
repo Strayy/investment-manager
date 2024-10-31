@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Table from "../components/Table";
+import CurrencyWrapper from "../components/CurrencyWrapper";
 import { ITableData } from "../types/tableData";
 
 function Transactions() {
@@ -43,9 +44,21 @@ function Transactions() {
                     `${exchange}: ${ticker}`,
                     transaction.action,
                     Math.round(transaction.amount * 100) / 100,
-                    transaction.price.toFixed(2),
-                    (transaction.amount * transaction.price).toFixed(2),
-                    adjCloseReturned[transaction.stockId].toFixed(2),
+                    <CurrencyWrapper
+                        currency='USD'
+                        data={transaction.price.toFixed(2)}
+                        key={`${transaction.stockId}_PurchasePrice`}
+                    />,
+                    <CurrencyWrapper
+                        currency='USD'
+                        data={(transaction.amount * transaction.price).toFixed(2)}
+                        key={`${transaction.stockId}_TotalPrice`}
+                    />,
+                    <CurrencyWrapper
+                        currency='USD'
+                        data={adjCloseReturned[transaction.stockId].toFixed(2)}
+                        key={`${transaction.stockId}_CurrentPrice`}
+                    />,
                     (
                         ((adjCloseReturned[transaction.stockId] - transaction.price) /
                             adjCloseReturned[transaction.stockId]) *

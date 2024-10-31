@@ -83,14 +83,14 @@ function Portfolio() {
                     ticker,
                     Math.round(stockData["amount"] * 100) / 100,
                     <CurrencyWrapper
-                        currency='AUD'
+                        currency='USD'
                         data={pricingDataJson["latestPrice"]["adjClose"]}
                         key={stockKey}
                     />,
                     pricingDataJson["dailyChange"]["percentage"].toFixed(2),
                     pricingDataJson["ytd"]["percentage"].toFixed(2),
                     <CurrencyWrapper
-                        currency='AUD'
+                        currency='USD'
                         data={stockData["averageBuyPrice"]}
                         key={stockKey}
                     />,

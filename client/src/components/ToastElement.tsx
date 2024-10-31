@@ -17,6 +17,12 @@ function ToastElement({
         }
     }, [visible]);
 
+    useEffect(() => {
+        setTimeout(() => {
+            setVisible(false);
+        }, 10000);
+    });
+
     return (
         <div
             className={visible ? "toast-element" : "toast-element fade-out"}

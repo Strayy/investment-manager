@@ -15,9 +15,7 @@ function Header() {
 
         Object.entries(currencies).forEach((currency) => {
             currencyOptions.push(
-                <option value={currency[0]} selected={selectedCurrency === currency[0] && true}>
-                    {`${currency[0]} ${currency[1].symbol}`}
-                </option>,
+                <option value={currency[0]}>{`${currency[0]} ${currency[1].symbol}`}</option>,
             );
         });
 
@@ -30,7 +28,7 @@ function Header() {
                 <input type='text' placeholder='Search...' />
             </span>
             <span>
-                <select onChange={(e) => changeCurrency(e.target.value)}>
+                <select onChange={(e) => changeCurrency(e.target.value)} defaultValue={"USD"}>
                     {currencyGenerator()}
                 </select>
                 <div className='notifications'>

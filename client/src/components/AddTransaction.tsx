@@ -30,6 +30,7 @@ function AddTransaction({
     const [searchActive, setSearchActive] = useState<boolean>(false);
     const [fuzzySearchData, setFuzzySearchData] = useState<FuzzySearchResponse[] | undefined>();
     const [selectedStockData, setSelectedStockData] = useState<null | string>(null);
+    const [stockName, setStockName] = useState<null | string>();
 
     // Handle state for conditionally rendering loading spinner and error message.
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -134,7 +135,7 @@ function AddTransaction({
                 setIsLoading(false);
                 successAction();
                 addNotification(
-                    `${transactionMode ? "Bought" : "Sold"} ${amount} ${selectedStockData} ${Number(amount) > 1 ? "shares" : "share"}`,
+                    `${transactionMode ? "Bought" : "Sold"} ${amount} ${stockName} ${Number(amount) > 1 ? "shares" : "share"}`,
                 );
             }, 3000);
         } catch (err) {
@@ -153,6 +154,7 @@ function AddTransaction({
                     <div
                         key={stock.item.id}
                         onClick={() => {
+                            setStockName(stock.item.name);
                             setSelectedStockData(`${stock.item.exchange}: ${stock.item.ticker}`);
                         }}
                     >
@@ -192,8 +194,6 @@ function AddTransaction({
 
         if (decimalCount <= 1) {
             if (inputType == "amount") {
-                console.log(true);
-
                 let currentStockHoldings = 0;
 
                 if (selectedStockData) {

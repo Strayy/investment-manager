@@ -14,10 +14,6 @@ function CurrencyWrapper({
 }) {
     const [selectedCurrency, setSelectedCurrency] = useContext(Context).currency;
 
-    useEffect(() => {
-        console.log(selectedCurrency);
-    }, [selectedCurrency]);
-
     const [convertedCurrency, setConvertedCurrency] = useState<number>();
 
     useEffect(() => {

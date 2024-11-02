@@ -26,6 +26,7 @@ function Portfolio() {
             percentage: number;
         };
     } | null>(null);
+    const [forceRefresh, setForceRefresh] = useState<boolean>(false);
 
     // Check link to see if it has the buy param. I.e., /portfolio/buy. If true, open the add transaction dialog. If /portfolio only, do nothing. If /portfolio/anything_else, redirect to the dashboard.
     useEffect(() => {
@@ -107,7 +108,7 @@ function Portfolio() {
         }
 
         getPortfolioData();
-    }, []);
+    }, [forceRefresh]);
 
     // Updates tableData state when portfolioData is changed.
     useEffect(() => {
@@ -146,6 +147,7 @@ function Portfolio() {
 
     function closeDialog() {
         navigate("/portfolio");
+        setTransactionMode(true);
         setShowDialog(false);
     }
 
@@ -156,7 +158,10 @@ function Portfolio() {
                     dialogContent={
                         <AddTransaction
                             transactionMode={transactionMode}
-                            successAction={() => closeDialog()}
+                            successAction={() => {
+                                setForceRefresh((forceRefresh) => !forceRefresh);
+                                closeDialog();
+                            }} // Add force refresh here
                             totalPortfolioValue={totalPortfolioValue}
                             holdings={holdings}
                         />

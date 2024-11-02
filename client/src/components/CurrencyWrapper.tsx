@@ -12,7 +12,7 @@ function CurrencyWrapper({
     data: string | number;
     className?: string;
 }) {
-    const [selectedCurrency, setSelectedCurrency] = useContext(Context).currency;
+    const [selectedCurrency] = useContext(Context).currency;
 
     const [convertedCurrency, setConvertedCurrency] = useState<number>();
 

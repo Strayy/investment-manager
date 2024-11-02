@@ -15,7 +15,10 @@ function Header() {
 
         Object.entries(currencies).forEach((currency) => {
             currencyOptions.push(
-                <option value={currency[0]}>{`${currency[0]} ${currency[1].symbol}`}</option>,
+                <option
+                    key={currency[0]}
+                    value={currency[0]}
+                >{`${currency[0]} ${currency[1].symbol}`}</option>,
             );
         });
 

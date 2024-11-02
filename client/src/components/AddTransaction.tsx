@@ -198,7 +198,8 @@ function AddTransaction({
 
                 if (selectedStockData) {
                     currentStockHoldings =
-                        holdings[selectedStockData.replace(" ", "").split(":").join("_")].amount;
+                        holdings[selectedStockData.replace(" ", "").split(":").join("_")]?.amount ||
+                        0;
                 }
                 if (!transactionMode && Number(sanitizedValue) > currentStockHoldings) {
                     stateReference(String(currentStockHoldings));

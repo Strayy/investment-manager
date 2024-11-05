@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Graph from "../components/Graph";
 import Table from "../components/Table";
@@ -6,7 +7,6 @@ import Dialog from "../components/Dialog";
 import AddTransaction from "../components/AddTransaction";
 import CurrencyWrapper from "../components/CurrencyWrapper";
 import { ITableData, Section } from "../types/tableData";
-import { useParams, useNavigate } from "react-router-dom";
 
 function Portfolio() {
     const { param } = useParams();
@@ -161,7 +161,7 @@ function Portfolio() {
                             successAction={() => {
                                 setForceRefresh((forceRefresh) => !forceRefresh);
                                 closeDialog();
-                            }} // Add force refresh here
+                            }}
                             totalPortfolioValue={totalPortfolioValue}
                             holdings={holdings}
                         />

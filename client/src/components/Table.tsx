@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, isValidElement } from "react";
 import { ITableData, Section } from "../types/tableData";
 
 import SkeletonLoading from "./SkeletonLoading";
@@ -28,7 +28,7 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
     }, [data, columnSortIndex, columnSortOrder]);
 
     // Style table cell based on styleColumnsByValue and columnStyling data
-    function styleCell(dataContent: string | number, columnIndex: number) {
+    function styleCell(dataContent: string | number | ReactElement, columnIndex: number) {
         // Returns the corresponding array index in styleColumnsByValue for cell index. I.e., first column (cell index 0) in [[1], [2], [0]] equals 2. Returns -1 if it doesn't exist.
         const arrayIndex = data?.settings?.styleColumnsByValue?.findIndex(
             (array: number[]) => array.indexOf(columnIndex) !== -1,
@@ -177,32 +177,53 @@ function Table({ data, isLoading }: { data: ITableData | null; isLoading?: boole
                         </tr>,
                     ]);
 
-                    const sortData: { [key: string | number]: (string | number)[][] } = {};
+                    const sortData: {
+                        [key: string | number]: (string | number | ReactElement)[][];
+                    } = {};
 
                     if (columnSortIndex !== null) {
-                        section[1].data.forEach((sectionData: (string | number)[]) => {
-                            if (!sortData[sectionData[columnSortIndex]]) {
-                                sortData[sectionData[columnSortIndex]] = [];
-                            }
+                        section[1].data.forEach(
+                            (sectionData: (string | number | ReactElement<{ data: number }>)[]) => {
+                                let currentData = sectionData[columnSortIndex];
 
-                            sortData[sectionData[columnSortIndex]].push(sectionData);
-                        });
+                                // Check to see if table data cell is React element. Extract data proprty if true for sorting
+                                if (isValidElement(currentData)) {
+                                    currentData = currentData.props.data;
+                                }
+
+                                // Convert values to be sorted into string format
+                                const sortKey = String(currentData);
+
+                                if (!sortData[sortKey]) {
+                                    sortData[sortKey] = [];
+                                }
+
+                                sortData[sortKey].push(sectionData);
+                            },
+                        );
                     }
 
-                    const createDataRow = (sectionData: (string | number)[], rowIndex: number) => {
+                    const createDataRow = (
+                        sectionData: (string | number | ReactElement)[],
+                        rowIndex: number,
+                    ) => {
                         const sectionRow: JSX.Element[] = [];
 
-                        sectionData.forEach((sectionDataItem: string | number, index: number) => {
-                            // Conditionally checks if cell styling is specified in table data prop and attempts to style all cells if true. Otherwise, no point attempting to style so just pushes the data to array.
-                            sectionRow.push(
-                                <td key={`section-${sectionIndex}-row-${rowIndex}-column-${index}`}>
-                                    {data?.settings?.styleColumnsByValue &&
-                                    data?.settings.columnStyling
-                                        ? styleCell(sectionDataItem, index)
-                                        : sectionDataItem}
-                                </td>,
-                            );
-                        });
+                        sectionData.forEach(
+                            (sectionDataItem: string | number | ReactElement, index: number) => {
+                                // Conditionally checks if cell styling is specified in table data prop and attempts to style all cells if true. Otherwise, no point attempting to style so just pushes the data to array.
+                                sectionRow.push(
+                                    <td
+                                        key={`section-${sectionIndex}-row-${rowIndex}-column-${index}`}
+                                    >
+                                        {data?.settings?.styleColumnsByValue &&
+                                        data?.settings.columnStyling
+                                            ? styleCell(sectionDataItem, index)
+                                            : sectionDataItem}
+                                    </td>,
+                                );
+                            },
+                        );
 
                         sectionElement.push([
                             <tr key={`section-${sectionIndex}-row`}>{sectionRow}</tr>,

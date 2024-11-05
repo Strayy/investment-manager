@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 
-import { currencies } from "../constants/currencies.ts";
 import { Context } from "../App.tsx";
 
 function CurrencyWrapper({
@@ -29,11 +28,14 @@ function CurrencyWrapper({
         fetchConversionRate();
     }, [selectedCurrency]);
 
-    function formatCurrency() {
-        return `${Object.keys(currencies).includes(selectedCurrency) ? currencies[selectedCurrency].symbol : "$"}${Math.round(Number(convertedCurrency) * 100) / 100}`;
-    }
-
-    return <p className={className}>{formatCurrency()}</p>;
+    return (
+        <p className={className}>
+            {new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: selectedCurrency,
+            }).format(Number(convertedCurrency))}
+        </p>
+    );
 }
 
 export default CurrencyWrapper;

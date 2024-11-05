@@ -8,6 +8,7 @@
     border-bottom: 2px solid #002945;
     padding-bottom: 1em;
     height: 50.656px;
+    flex-shrink: 0;
 
     > span {
         display: flex;

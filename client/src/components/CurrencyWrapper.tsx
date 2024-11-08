@@ -22,10 +22,14 @@ function CurrencyWrapper({
             );
             const conversionRateData = await conversionRateJson.json();
 
-            setConvertedCurrency(conversionRateData * Number(data));
+            setConvertedCurrency(conversionRateData.rate * Number(data));
         }
 
-        fetchConversionRate();
+        if (selectedCurrency != currency) {
+            fetchConversionRate();
+        } else {
+            setConvertedCurrency(Number(data));
+        }
     }, [selectedCurrency]);
 
     return (

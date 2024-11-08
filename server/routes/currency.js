@@ -46,11 +46,11 @@ router.get("/rate", async (req, res) => {
             );
         }
 
-        // Find most recent data entry in last 12 hours
+        // Find most recent data entry in last 24 hours
         let data = await currencyModel
             .findOne({
                 currencyPair: `${fromCurrency}_${toCurrency}`,
-                date: { $gte: new Date(Date.now() - 60 * 60 * 12 * 1000) },
+                date: { $gte: new Date(Date.now() - 60 * 60 * 24 * 1000) },
             })
             .sort({ date: -1 });
 
@@ -73,14 +73,10 @@ router.get("/rate", async (req, res) => {
             };
 
             supportedCurrenncies.forEach(async (currency) => {
-                if (currency === fromCurrency) {
-                    return;
-                }
-
                 await currencyModel.insertMany({
                     date: new Date(conversionJson.time_last_update_unix * 1000),
                     currencyPair: `${fromCurrency}_${currency}`,
-                    rate: Number(conversionJson.rates[toCurrency]),
+                    rate: Number(conversionJson.rates[currency]),
                 });
             });
         };

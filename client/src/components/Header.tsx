@@ -4,7 +4,7 @@ import { Context } from "../App";
 import { currencies } from "../constants/currencies";
 
 function Header() {
-    const [selectedCurrency, setSelectedCurrency] = useContext(Context).currency;
+    const [selectedCurrency, setSelectedCurrency] = useContext(Context).selectedCurrency;
 
     function changeCurrency(currency: string) {
         setSelectedCurrency(currency);

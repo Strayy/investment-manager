@@ -11,7 +11,8 @@ function CurrencyWrapper({
     data: string | number;
     className?: string;
 }) {
-    const [selectedCurrency] = useContext(Context).currency;
+    const [selectedCurrency] = useContext(Context).selectedCurrency;
+    const [currencyRates] = useContext(Context).currencyRates;
 
     const [convertedCurrency, setConvertedCurrency] = useState<number>();
 
@@ -25,10 +26,10 @@ function CurrencyWrapper({
             setConvertedCurrency(conversionRateData.rate * Number(data));
         }
 
-        if (selectedCurrency != currency) {
-            fetchConversionRate();
+        if (currencyRates !== null && currencyRates[selectedCurrency]) {
+            setConvertedCurrency(Number(currencyRates[selectedCurrency].rate) * Number(data));
         } else {
-            setConvertedCurrency(Number(data));
+            fetchConversionRate();
         }
     }, [selectedCurrency]);
 

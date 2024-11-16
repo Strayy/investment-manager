@@ -56,7 +56,6 @@ router.get("/rate", async (req, res) => {
 
         const updatePair = async () => {
             const conversionData = await fetch(`https://open.er-api.com/v6/latest/${fromCurrency}`);
-
             const conversionJson = await conversionData.json();
 
             // Throw an error if API returns result as anything other than success.

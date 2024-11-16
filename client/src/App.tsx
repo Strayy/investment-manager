@@ -2,8 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, createContext, useEffect } from "react";
 
 import { IToastMessage } from "./types/toastMessage";
+import { ICurrencyExchange } from "./types/currency";
 
 import "./styles/styles.scss";
+import { currencies } from "./constants/currencies.ts";
 
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
@@ -12,21 +14,48 @@ import Transactions from "./pages/Transactions";
 
 export const Context = createContext<{
     toastMessages: [IToastMessage[], any];
-    currency: [string, any];
+    selectedCurrency: [string, any];
+    currencyRates: [ICurrencyExchange | null, any];
 }>({
     toastMessages: [[], () => null],
-    currency: ["USD", () => null],
+    selectedCurrency: ["USD", () => null],
+    currencyRates: [{}, () => null],
 });
 
 function App() {
-    const [toastMessages, setToastMessages] = useState<IToastMessage[]>([]);
-    const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
+    const [toastMessages, setToastMessages] = useState([]);
+    const [selectedCurrency, setSelectedCurrency] = useState("USD");
+    const [currencyRates, setCurrencyRates] = useState<ICurrencyExchange | null>(null);
+
+    useEffect(() => {
+        async function fetchConversionRate(currency: string) {
+            console.log("fetch Conversion Rate");
+
+            const conversionRateJson = await fetch(
+                `${process.env.REACT_APP_SERVER_ADDRESS}currency/rate?from=USD&to=${currency}`,
+            );
+            const conversionRateData = await conversionRateJson.json();
+
+            setCurrencyRates((prevState) => ({
+                ...prevState,
+                [currency]: {
+                    date: conversionRateData.date,
+                    rate: conversionRateData.rate,
+                },
+            }));
+        }
+
+        Object.keys(currencies).forEach(async (currency) => {
+            await fetchConversionRate(currency);
+        });
+    }, []);
 
     return (
         <Context.Provider
             value={{
                 toastMessages: [toastMessages, setToastMessages],
-                currency: [selectedCurrency, setSelectedCurrency],
+                selectedCurrency: [selectedCurrency, setSelectedCurrency],
+                currencyRates: [currencyRates, setCurrencyRates],
             }}
         >
             <BrowserRouter>

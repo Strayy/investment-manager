@@ -1,12 +1,17 @@
 import hexRgb from "hex-rgb";
-import { useEffect, useState } from "react";
+const { v4: uuidv4 } = require("uuid");
+import { useContext, useEffect, useState } from "react";
 
 import SkeletonLoading from "./SkeletonLoading";
 
 import { Favourites } from "../types/favourites";
 import CurrencyWrapper from "./CurrencyWrapper";
 
+import { Context } from "../App";
+
 function Watchlist() {
+    const [toastElements, setToastElements] = useContext(Context).toastMessages;
+
     const [investments, setInvestments] = useState<Favourites>({});
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -38,7 +43,11 @@ function Watchlist() {
                     color: stockProfileJson.colors.accent || "#002945",
                     currentPrice: stockPerformanceJson.latestPrice.close,
                     change: Math.round(stockPerformanceJson.dailyChange.percentage * 100) / 100,
-                    companyLogo: stockProfileJson.logos.light_symbol,
+                    companyLogo:
+                        stockProfileJson.logos.light_symbol ||
+                        stockProfileJson.logos.dark_symbol ||
+                        stockProfileJson.logos.light_logo ||
+                        stockProfileJson.logos.dark_logo,
                     companyWebsite: stockProfileJson.website || "#",
                     currency: stockProfileJson.currency,
                 };
@@ -90,6 +99,14 @@ function Watchlist() {
                             const newInvestments = { ...investments };
                             delete newInvestments[item.stockId];
                             setInvestments(newInvestments);
+
+                            setToastElements([
+                                ...toastElements,
+                                {
+                                    id: uuidv4(),
+                                    message: `Removed ${item.name} from watchlist`,
+                                },
+                            ]);
                         }}
                     ></i>
                     <div className='watchlist-item-inner'>
@@ -130,7 +147,6 @@ function Watchlist() {
                                     "https://icons.veryicon.com/png/o/business/oa-attendance-icon/company-27.png"
                                 }
                                 alt={item.name + " Logo"}
-                                className={!item.companyLogo ? "logo-white" : ""}
                             />
                         </div>
                     </a>

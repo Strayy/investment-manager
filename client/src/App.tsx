@@ -29,8 +29,6 @@ function App() {
 
     useEffect(() => {
         async function fetchConversionRate(currency: string) {
-            console.log("fetch Conversion Rate");
-
             const conversionRateJson = await fetch(
                 `${process.env.REACT_APP_SERVER_ADDRESS}currency/rate?from=USD&to=${currency}`,
             );

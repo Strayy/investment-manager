@@ -100,11 +100,9 @@
 
             img {
                 max-height: 2em;
-                max-width: 6em;
-
-                &.logo-white {
-                    filter: brightness(0) invert(1);
-                }
+                max-width: 4em;
+                object-fit: cover;
+                filter: brightness(0) invert(1);
             }
         }
     }
